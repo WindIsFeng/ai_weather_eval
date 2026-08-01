@@ -1,0 +1,13 @@
+dataset: ibtracs
+role: best_track
+version: null                       # Pin before producing research results.
+path: ${AI_WEATHER_EVAL_DATA}/raw/ibtracs/ibtracs.ALL.list.v04r01.csv
+storm_id_variable: SID
+time_variable: ISO_TIME
+latitude_variable: LAT
+longitude_variable: LON
+intensity_variable: USA_WIND
+pressure_variable: USA_PRES
+wind_averaging_period: 1min
+wind_unit: kt
+

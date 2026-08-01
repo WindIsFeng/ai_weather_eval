@@ -1,0 +1,8 @@
+dataset: gshhg
+role: landfall_detection
+version: null                       # Pin the exact GSHHG release before catalog freeze.
+path: ${AI_WEATHER_EVAL_DATA}/raw/coastline/gshhg
+include_islands: true
+exclude_lakes: true
+longitude_convention: -180_180
+

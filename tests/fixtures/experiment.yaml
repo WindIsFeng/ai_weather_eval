@@ -1,0 +1,12 @@
+experiment:
+  name: fixture
+period:
+  start: 2022-01-01T00:00:00Z
+  end: 2022-12-31T23:59:59Z
+case_selection:
+  lifetime_peak_threshold_kt: 64
+forecast_sampling:
+  nominal_lead_hours: [24, 48, 72, 96, 120]
+verification:
+  track_metrics: [position_error]
+

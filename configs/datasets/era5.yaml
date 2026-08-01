@@ -1,0 +1,18 @@
+dataset: era5
+role: atmospheric_truth
+version: null                       # Record download date/revision in the manifest.
+path_template: ${AI_WEATHER_EVAL_DATA}/raw/era5/{year}/{variable}_{year}{month:02d}.nc
+coordinate_names:
+  time: time
+  latitude: latitude
+  longitude: longitude
+variables:
+  msl: msl
+  u10: u10
+  v10: v10
+  z500: z
+  u850: u
+  v850: v
+  u200: u
+  v200: v
+

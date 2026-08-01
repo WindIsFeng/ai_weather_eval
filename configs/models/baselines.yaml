@@ -1,0 +1,13 @@
+models:
+  - model: ifs
+    adapter: generic_xarray
+    enabled: false
+    path_template: ${AI_WEATHER_EVAL_DATA}/raw/baselines/ifs/{init_time:%Y%m%d%H}.nc
+  - model: gfs
+    adapter: generic_xarray
+    enabled: false
+    path_template: ${AI_WEATHER_EVAL_DATA}/raw/baselines/gfs/{init_time:%Y%m%d%H}.nc
+  - model: persistence
+    adapter: persistence
+    enabled: false
+

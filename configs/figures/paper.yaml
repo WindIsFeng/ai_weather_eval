@@ -1,0 +1,12 @@
+formats: [png, pdf]
+dpi: 300
+style: paper
+figures:
+  - case_distribution_map
+  - track_error_by_lead
+  - intensity_error_by_lead
+  - landfall_error_map
+  - field_skill_by_lead
+show_sample_size: true
+show_confidence_interval: true
+

@@ -1,0 +1,8 @@
+data_root: ${AI_WEATHER_EVAL_DATA}
+raw_root: ${AI_WEATHER_EVAL_DATA}/raw
+interim_root: ${AI_WEATHER_EVAL_DATA}/interim
+processed_root: ${AI_WEATHER_EVAL_DATA}/processed
+cache_root: ${AI_WEATHER_EVAL_DATA}/cache
+output_root: outputs
+report_root: reports
+

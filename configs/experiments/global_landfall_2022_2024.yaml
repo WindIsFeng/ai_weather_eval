@@ -1,0 +1,49 @@
+experiment:
+  name: global_landfall_2022_2024
+  description: Global landfalling hurricane-strength tropical cyclones during 2022-2024
+  output_root: outputs
+
+period:
+  basis: observed_landfall_time
+  start: 2022-01-01T00:00:00Z
+  end: 2024-12-31T23:59:59Z
+
+case_selection:
+  best_track_dataset: ibtracs
+  intensity_source: USA_WIND
+  lifetime_peak_threshold_kt: 64
+  landfall_unit: every_ocean_to_land_crossing
+  allow_subtropical_landfall: true
+  allow_extratropical_landfall: false
+  include_islands: true
+  manual_qc_overrides: ${AI_WEATHER_EVAL_DATA}/interim/case_catalog/qc_overrides.yaml
+
+forecast_sampling:
+  nominal_lead_hours: [24, 48, 72, 96, 120]
+  standard_cycle_hours_utc: [0, 6, 12, 18]
+  maximum_cycle_offset_hours: 3
+  primary_comparison_sample: common_model_intersection
+
+models:
+  - pangu_weather
+  - fengwu
+  - fuxi
+  - graphcast
+  - aurora
+
+verification:
+  track_metrics: [position_error, along_track_error, cross_track_error]
+  intensity_metrics: [vmax_bias, vmax_mae, vmax_rmse, mslp_bias, mslp_mae, mslp_rmse]
+  landfall_metrics: [hit, time_error, position_error, vmax_error, mslp_error]
+  field_variables: [msl, u10, v10, z500, u850, v850, u200, v200]
+  field_metrics: [bias, rmse, anomaly_correlation]
+  field_frames: [earth_relative, storm_centered]
+  common_grid_degrees: 0.25
+
+statistics:
+  aggregation_dimensions: [model, basin, year, nominal_lead_hours]
+  cluster_unit: storm_id
+  bootstrap_replicates: 1000
+  confidence_level: 0.95
+  random_seed: 20220801
+

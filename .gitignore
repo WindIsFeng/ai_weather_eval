@@ -1,0 +1,42 @@
+# Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.coverage
+htmlcov/
+.venv/
+venv/
+dist/
+build/
+*.egg-info/
+
+# Editors and operating systems
+.idea/
+.vscode/
+.DS_Store
+
+# Local configuration and credentials
+.env
+configs/local*.yaml
+
+# Runtime outputs (keep the directory contract)
+outputs/*
+!outputs/README.md
+
+# Local notebook state
+.ipynb_checkpoints/
+
+# Large data must live outside the repository
+data/raw/
+data/interim/
+data/processed/
+data/cache/
+*.nc
+*.nc4
+*.grib
+*.grb
+*.grb2
+*.zarr/
+

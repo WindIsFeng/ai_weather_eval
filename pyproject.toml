@@ -1,0 +1,55 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "ai-weather-eval"
+version = "0.1.0"
+description = "Evaluation framework for AI forecasts of global landfalling tropical cyclones"
+readme = "README.md"
+requires-python = ">=3.10"
+authors = [{name = "AI Weather Evaluation Team"}]
+dependencies = [
+  "dask[array]>=2023.6",
+  "netCDF4>=1.6",
+  "numpy>=1.24",
+  "pandas>=2.0",
+  "pyyaml>=6.0",
+  "scipy>=1.10",
+  "xarray>=2023.6",
+  "zarr>=2.16,<3",
+]
+
+[project.optional-dependencies]
+geo = [
+  "geopandas>=0.14",
+  "shapely>=2.0",
+  "xesmf>=0.8",
+]
+plot = [
+  "cartopy>=0.22",
+  "matplotlib>=3.7",
+  "seaborn>=0.13",
+]
+dev = [
+  "pytest>=7.4",
+  "pytest-cov>=4.1",
+  "ruff>=0.5",
+]
+
+[project.scripts]
+weather-eval = "ai_weather_eval.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+addopts = "-ra"
+testpaths = ["tests"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B"]
