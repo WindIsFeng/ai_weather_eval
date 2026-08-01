@@ -1,47 +1,58 @@
 # AI Weather Evaluation
 
-评估 Pangu-Weather、FengWu、FuXi、GraphCast、Aurora 等 AI 天气模型对
-2022–2024 年全球登陆强热带气旋的预测表现。
+This project evaluates how well AI weather models, including Pangu-Weather,
+FengWu, FuXi, GraphCast, and Aurora, predict strong landfalling tropical
+cyclones worldwide during 2022–2024.
 
-本仓库只负责案例管理、模型输出适配、评估、统计和绘图；模型推理及大体量数据
-存储位于仓库外。
+This repository contains case management, model-output adapters, verification,
+statistical analysis, and plotting code. Model inference and large datasets are
+managed outside this repository.
 
-## 研究范围
+## Research Scope
 
-- 样本：登陆发生于 2022-01-01 至 2024-12-31，且生命周期一分钟最大持续风速
-  达到 64 kt 的全球热带气旋。
-- 事件：同一风暴的不同登陆分别记录，统计时按风暴聚类。
-- 起报：登陆前 24、48、72、96、120 小时附近的标准 6 小时起报周期。
-- 指标：路径、最大风速、最低海平面气压、登陆时间/位置/强度及核心动力场。
-- 环境场：海平面气压、10 米风、500 hPa 位势高度、850/200 hPa 风；首版不含降水。
+- **Cases:** Tropical cyclones that made landfall between January 1, 2022 and
+  December 31, 2024, and reached a lifetime one-minute maximum sustained wind
+  speed of at least 64 kt.
+- **Events:** Separate landfalls by the same storm are retained as distinct
+  events, while statistical uncertainty is clustered by storm.
+- **Initializations:** Standard six-hourly forecast cycles near 24, 48, 72, 96,
+  and 120 hours before observed landfall.
+- **Metrics:** Track, maximum wind, minimum sea-level pressure, landfall time,
+  location and intensity, and core dynamical fields.
+- **Fields:** Mean sea-level pressure, 10 m winds, 500 hPa geopotential height,
+  and 850/200 hPa winds. Precipitation is excluded from the initial version.
 
-详细口径见 [docs/methodology.md](docs/methodology.md)。
+See [docs/methodology.md](docs/methodology.md) for the detailed methodology.
 
-## 快速开始
+## Getting Started
 
-本项目统一使用已有的 `ai-weather-eval` Conda 环境，Python 版本固定为 3.12。
-当前不预装全部项目依赖；开发过程中缺少哪个包，就在该环境中通过 pip 按需安装。
-不要使用系统 Python、Conda `base`、uv 或另一个项目虚拟环境运行本项目。
+All project work must use the existing `ai-weather-eval` Conda environment,
+which is fixed to Python 3.12. Project dependencies are not installed in bulk;
+install packages with pip inside this environment only when a task requires
+them. Do not use the system Python, the Conda `base` environment, uv, or another
+project virtual environment.
+
+For interactive development:
 
 ```bash
 conda activate ai-weather-eval
 python --version
 ```
 
-非交互式脚本和自动化任务统一显式指定环境：
+For scripts and automated tasks, specify the environment explicitly:
 
 ```bash
 conda run --name ai-weather-eval python <script.py>
 conda run --name ai-weather-eval python -m pytest
 ```
 
-后续确实需要依赖时再安装，不做预安装：
+Install dependencies only when needed:
 
 ```bash
 conda run --name ai-weather-eval python -m pip install <package>
 ```
 
-需要使用项目 CLI 时，再以 editable 模式安装本地包：
+Install the local package in editable mode when the project CLI is needed:
 
 ```bash
 conda run --name ai-weather-eval python -m pip install --editable .
@@ -50,23 +61,27 @@ weather-eval config check --config configs/experiments/global_landfall_2022_2024
 weather-eval --help
 ```
 
-`environment.yml`只记录环境名、Python 3.12 和 pip，不维护具体科研包；具体 Python
-依赖仍记录在 `pyproject.toml`，但是否安装由当前开发任务决定。
+The `environment.yml` file records only the environment name, Python 3.12, and
+pip. Python dependency declarations remain in `pyproject.toml`, but packages
+are installed only as required by the current development task.
 
-当前提交是项目骨架。工作流命令和接口已经建立，但具体 IBTrACS 筛选、气旋追踪、
-指标计算和绘图算法将在后续实现。
+The repository is currently a project scaffold. Workflow commands and public
+interfaces are in place; IBTrACS case selection, cyclone tracking, verification
+algorithms, and plotting implementations will be added incrementally.
 
-## 目录职责
+## Repository Layout
 
-- `configs/`：数据集、模型、实验和绘图配置。
-- `data/`：只保存数据说明、清单和小型测试样例。
-- `src/ai_weather_eval/`：所有可测试的生产代码。
-- `tests/`：单元测试、集成测试和小型夹具。
-- `notebooks/`：探索、人工质控和成果审阅，不承载核心流程。
-- `outputs/`：运行产物，不纳入 Git。
-- `reports/`：人工确认后的论文图表，可纳入 Git。
+- `configs/`: Dataset, model, experiment, and figure configuration.
+- `data/`: Data documentation, manifests, and small test samples only.
+- `src/ai_weather_eval/`: Tested production code.
+- `tests/`: Unit tests, integration tests, and compact fixtures.
+- `notebooks/`: Exploration, manual quality control, and artifact review; core
+  workflow logic does not belong here.
+- `outputs/`: Generated run artifacts excluded from Git.
+- `reports/`: Reviewed publication figures and tables that may be versioned.
 
-## 外部数据
+## External Data
 
-真实数据根目录由 `AI_WEATHER_EVAL_DATA` 指定，推荐布局见
-[data/README.md](data/README.md)。禁止将 NetCDF、GRIB 或 Zarr 大文件提交到仓库。
+Set `AI_WEATHER_EVAL_DATA` to the root of the external data store. The
+recommended layout is documented in [data/README.md](data/README.md). Do not
+commit full NetCDF, GRIB, or Zarr datasets to this repository.
