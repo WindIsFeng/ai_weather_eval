@@ -19,15 +19,39 @@
 
 ## 快速开始
 
-```bash
-python3.10 -m venv .venv
-source .venv/bin/activate
-python -m pip install -e '.[geo,plot,dev]'
+本项目统一使用已有的 `ai-weather-eval` Conda 环境，Python 版本固定为 3.12。
+当前不预装全部项目依赖；开发过程中缺少哪个包，就在该环境中通过 pip 按需安装。
+不要使用系统 Python、Conda `base`、uv 或另一个项目虚拟环境运行本项目。
 
+```bash
+conda activate ai-weather-eval
+python --version
+```
+
+非交互式脚本和自动化任务统一显式指定环境：
+
+```bash
+conda run --name ai-weather-eval python <script.py>
+conda run --name ai-weather-eval python -m pytest
+```
+
+后续确实需要依赖时再安装，不做预安装：
+
+```bash
+conda run --name ai-weather-eval python -m pip install <package>
+```
+
+需要使用项目 CLI 时，再以 editable 模式安装本地包：
+
+```bash
+conda run --name ai-weather-eval python -m pip install --editable .
 export AI_WEATHER_EVAL_DATA=/path/to/ai_weather_eval_data
 weather-eval config check --config configs/experiments/global_landfall_2022_2024.yaml
 weather-eval --help
 ```
+
+`environment.yml`只记录环境名、Python 3.12 和 pip，不维护具体科研包；具体 Python
+依赖仍记录在 `pyproject.toml`，但是否安装由当前开发任务决定。
 
 当前提交是项目骨架。工作流命令和接口已经建立，但具体 IBTrACS 筛选、气旋追踪、
 指标计算和绘图算法将在后续实现。
@@ -46,4 +70,3 @@ weather-eval --help
 
 真实数据根目录由 `AI_WEATHER_EVAL_DATA` 指定，推荐布局见
 [data/README.md](data/README.md)。禁止将 NetCDF、GRIB 或 Zarr 大文件提交到仓库。
-

@@ -1,0 +1,7 @@
+name: ai-weather-eval
+
+# Conda only provides an isolated Python runtime. Project dependencies are
+# resolved from pyproject.toml and installed with pip inside this environment.
+dependencies:
+  - python=3.12
+  - pip
