@@ -1,7 +1,10 @@
 dataset: ibtracs
 role: best_track
-version: null                       # Pin before producing research results.
-path: ${AI_WEATHER_EVAL_DATA}/raw/ibtracs/ibtracs.ALL.list.v04r01.csv
+version: v04r01
+subset: since1980
+source_last_modified_utc: 2026-07-28T08:55:00Z
+path: ${AI_WEATHER_EVAL_DATA}/raw/ibtracs/ibtracs.since1980.list.v04r01.csv
+sha256: 110faa2fe647368c4b89e063ddd70543ecd7606a81671e74ff6cd3c883e4a44b
 storm_id_variable: SID
 time_variable: ISO_TIME
 latitude_variable: LAT
@@ -10,4 +13,4 @@ intensity_variable: USA_WIND
 pressure_variable: USA_PRES
 wind_averaging_period: 1min
 wind_unit: kt
-
+accepted_track_types: [main, provisional, us-provisional]

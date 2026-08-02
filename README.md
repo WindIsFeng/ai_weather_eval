@@ -1,8 +1,8 @@
 # AI Weather Evaluation
 
 This project evaluates how well AI weather models, including Pangu-Weather,
-FengWu, FuXi, GraphCast, and Aurora, predict strong landfalling tropical
-cyclones worldwide during 2022–2024.
+FengWu, FuXi, GraphCast, and Aurora, predict tropical cyclones with substantial
+coastal wind exposure worldwide during 2022–2024.
 
 This repository contains case management, model-output adapters, verification,
 statistical analysis, and plotting code. Model inference and large datasets are
@@ -10,11 +10,15 @@ managed outside this repository.
 
 ## Research Scope
 
-- **Cases:** Tropical cyclones that made landfall between January 1, 2022 and
-  December 31, 2024, and reached a lifetime one-minute maximum sustained wind
-  speed of at least 64 kt.
-- **Events:** Separate landfalls by the same storm are retained as distinct
-  events, while statistical uncertainty is clustered by storm.
+- **Cases:** Coastal-contact episodes whose IBTrACS `USA_WIND` reaches at least
+  64 kt within six hours of the episode. The primary sample includes coastline
+  crossings and non-crossing storms whose 50 or 64 kt wind radii reach land.
+- **Events:** Coastal contacts separated by more than six hours are distinct
+  events. Storm identity is always the IBTrACS `SID`, never name or year, and
+  statistical uncertainty is clustered by `SID`.
+- **Distance:** Track-to-coast distance and crossings are computed directly
+  against fixed GSHHG coastlines with WGS84 ellipsoidal geodesics. IBTrACS
+  `DIST2LAND` and `LANDFALL` are not used.
 - **Initializations:** Standard six-hourly forecast cycles near 24, 48, 72, 96,
   and 120 hours before observed landfall.
 - **Metrics:** Track, maximum wind, minimum sea-level pressure, landfall time,
@@ -58,6 +62,9 @@ Install the local package in editable mode when the project CLI is needed:
 conda run --name ai-weather-eval python -m pip install --editable .
 export AI_WEATHER_EVAL_DATA=/path/to/ai_weather_eval_data
 weather-eval config check --config configs/experiments/global_landfall_2022_2024.yaml
+weather-eval catalog build \
+  --config configs/experiments/global_landfall_2022_2024.yaml \
+  --output-dir outputs/coastal_catalog_2022_2024
 weather-eval --help
 ```
 
@@ -65,9 +72,9 @@ The `environment.yml` file records only the environment name, Python 3.12, and
 pip. Python dependency declarations remain in `pyproject.toml`, but packages
 are installed only as required by the current development task.
 
-The repository is currently a project scaffold. Workflow commands and public
-interfaces are in place; IBTrACS case selection, cyclone tracking, verification
-algorithms, and plotting implementations will be added incrementally.
+The coastal-impact catalog builder is implemented. Model ingestion, forecast
+verification, statistical aggregation, and plotting remain scaffolded for
+incremental implementation.
 
 ## Repository Layout
 

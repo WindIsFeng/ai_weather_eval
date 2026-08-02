@@ -14,3 +14,8 @@
   `conda run --name ai-weather-eval python -m pip install <package>`.
 - Do not bulk-install optional dependency groups unless the user requests it.
 
+## Git workflow
+
+- Commit directly to `main` and push through the configured SSH remote.
+- Do not create a feature branch or use the GitHub CLI unless the user explicitly
+  requests an exception.

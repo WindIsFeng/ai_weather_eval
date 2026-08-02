@@ -18,9 +18,8 @@ class ContractTests(unittest.TestCase):
         self.assertEqual(great_circle_distance_km(10.0, 120.0, 10.0, 120.0), 0.0)
 
     def test_one_degree_equatorial_distance(self) -> None:
-        self.assertAlmostEqual(great_circle_distance_km(0.0, 0.0, 0.0, 1.0), 111.195, places=3)
+        self.assertAlmostEqual(great_circle_distance_km(0.0, 0.0, 0.0, 1.0), 111.319, places=3)
 
 
 if __name__ == "__main__":
     unittest.main()
-

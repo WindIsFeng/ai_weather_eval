@@ -1,11 +1,11 @@
-"""Track verification primitives."""
+"""Track verification primitives on the WGS84 ellipsoid."""
 
 from __future__ import annotations
 
-from math import asin, cos, radians, sin, sqrt
+from pyproj import Geod
 
 
-EARTH_RADIUS_KM = 6371.0088
+WGS84_GEOD = Geod(ellps="WGS84")
 
 
 def great_circle_distance_km(
@@ -14,12 +14,7 @@ def great_circle_distance_km(
     latitude_b: float,
     longitude_b: float,
 ) -> float:
-    """Return the haversine distance between two geographic points."""
+    """Return the WGS84 ellipsoidal geodesic distance between two points."""
 
-    lat_a = radians(latitude_a)
-    lat_b = radians(latitude_b)
-    delta_lat = lat_b - lat_a
-    delta_lon = radians(longitude_b - longitude_a)
-    haversine = sin(delta_lat / 2.0) ** 2 + cos(lat_a) * cos(lat_b) * sin(delta_lon / 2.0) ** 2
-    return 2.0 * EARTH_RADIUS_KM * asin(sqrt(min(1.0, haversine)))
-
+    _, _, distance_m = WGS84_GEOD.inv(longitude_a, latitude_a, longitude_b, latitude_b)
+    return float(distance_m) / 1000.0
