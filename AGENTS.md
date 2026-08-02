@@ -16,6 +16,6 @@
 
 ## Git workflow
 
-- Commit directly to `main` and push through the configured SSH remote.
-- Do not create a feature branch or use the GitHub CLI unless the user explicitly
-  requests an exception.
+- Commit directly to `main` unless the user explicitly requests a branch.
+- Use the configured Git remote and any suitable authenticated transport; the
+  GitHub CLI may be used when available and authenticated.
