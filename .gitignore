@@ -40,3 +40,6 @@ data/cache/
 *.grb2
 *.zarr/
 
+# Figures
+*.png
+*.tif
