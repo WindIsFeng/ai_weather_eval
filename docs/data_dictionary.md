@@ -14,7 +14,12 @@
 | `nearest_coast_latitude`, `nearest_coast_longitude` | 最近 GSHHG 海岸点 |
 | `minimum_coast_distance_km` | WGS84 椭球测地线最短距离；穿越时为 0 |
 | `coastal_episode_vmax_kt` | 接触事件前后各 6 h 窗口中的 `USA_WIND` 最大值 |
-| `coastline_crossing` | 路径是否与海岸线相交 |
+| `center_surface_at_closest_approach` | 最近海岸时中心为 `sea` 或位于 `coastline` |
+| `landfall_crossing`, `landfall_count` | 是否及多少次发生海→陆穿越 |
+| `coastline_exit`, `exit_count` | 事件窗口内是否及多少次发生陆→海穿越 |
+| `tangent_crossing_count` | 未改变 land/sea 状态的海岸线切触次数 |
+| `coastline_crossing`, `crossing_count` | `landfall_crossing` 的兼容字段 |
+| `landfall_vmax_kt` | 海→陆交点处插值风速的事件最大值 |
 | `r34_contact`, `r50_contact`, `r64_contact` | 相应风圈是否达到海岸 |
 | `tier` | 沿海影响层级 A、B、C 或 D |
 | `primary_sample` | 是否属于主样本（A+B） |

@@ -210,10 +210,10 @@ def _flag_duration_hours(frame: pd.DataFrame, flag_column: str) -> float:
     return float(np.sum(interval_hours * weights))
 
 
-def _episode_tier(episode: pd.DataFrame, crossing_vmax_kt: float) -> str:
-    if episode["r64_contact"].any() or crossing_vmax_kt >= 64.0:
+def _episode_tier(episode: pd.DataFrame, landfall_vmax_kt: float) -> str:
+    if episode["r64_contact"].any() or landfall_vmax_kt >= 64.0:
         return "A"
-    if episode["r50_contact"].any() or episode["coastline_crossing"].any():
+    if episode["r50_contact"].any() or episode["landfall_crossing"].any():
         return "B"
     if episode["r34_contact"].any():
         return "C"
@@ -231,6 +231,10 @@ def _prepare_storm_points(
         maximum_time_step_hours=selection.maximum_time_step_hours,
         maximum_track_gap_hours=selection.maximum_track_gap_hours,
     )
+    dense["is_land"] = coastline.points_on_land(
+        dense["LAT"].to_numpy(), dense["LON"].to_numpy()
+    )
+    dense["surface_type"] = np.where(dense["is_land"], "land", "sea")
     coast_distances = coastline.distances_to_points(
         dense["LAT"].to_numpy(),
         dense["LON"].to_numpy(),
@@ -253,24 +257,35 @@ def _prepare_storm_points(
             dense, threshold, dense["nearest_coast_bearing_degrees"]
         )
         dense[contact_column] = (
-            dense[radius_column].notna()
+            ~dense["is_land"]
+            & dense[radius_column].notna()
             & (dense["coast_distance_km"] <= dense[radius_column])
         )
 
     crossing_records = _find_storm_crossings(storm, coastline, selection)
-    dense["coastline_crossing"] = False
-    for crossing_time, _ in crossing_records:
+    dense["landfall_crossing"] = False
+    dense["coastline_exit"] = False
+    dense["coastline_tangent"] = False
+    for crossing_time, crossing in crossing_records:
         nearest_index = (dense["ISO_TIME"] - crossing_time).abs().idxmin()
-        dense.loc[nearest_index, "coastline_crossing"] = True
+        flag_column = {
+            "landfall": "landfall_crossing",
+            "exit": "coastline_exit",
+            "tangent": "coastline_tangent",
+        }.get(crossing.crossing_type)
+        if flag_column is not None:
+            dense.loc[nearest_index, flag_column] = True
+    dense["coastline_crossing"] = dense["landfall_crossing"]
 
     dense["distance_proxy_contact"] = (
-        dense["r34_toward_coast_km"].isna()
+        ~dense["is_land"]
+        & dense["r34_toward_coast_km"].isna()
         & (dense["coast_distance_km"] <= selection.missing_radius_distance_km)
     )
     dense["coastal_contact"] = (
         dense["r34_contact"]
         | dense["distance_proxy_contact"]
-        | dense["coastline_crossing"]
+        | dense["landfall_crossing"]
     )
     return dense, crossing_records
 
@@ -329,21 +344,34 @@ def build_coastal_impact_catalog(
 
             closest_index = episode_contact["coast_distance_km"].idxmin()
             closest = dense.loc[closest_index]
-            episode_crossings = [
+            episode_landfalls = [
                 (time, crossing)
                 for time, crossing in crossing_records
+                if crossing.crossing_type == "landfall"
                 if episode_start - padding <= time <= episode_end + padding
             ]
-            episode_crossing_times = [time for time, _ in episode_crossings]
-            crossing_vmax = float("nan")
-            if episode_crossing_times:
-                crossing_indices = [
-                    (dense["ISO_TIME"] - crossing_time).abs().idxmin()
-                    for crossing_time in episode_crossing_times
+            episode_exits = [
+                (time, crossing)
+                for time, crossing in crossing_records
+                if crossing.crossing_type == "exit"
+                if episode_start - padding <= time <= episode_end + padding
+            ]
+            episode_tangents = [
+                (time, crossing)
+                for time, crossing in crossing_records
+                if crossing.crossing_type == "tangent"
+                if episode_start - padding <= time <= episode_end + padding
+            ]
+            landfall_times = [time for time, _ in episode_landfalls]
+            landfall_vmax = float("nan")
+            if landfall_times:
+                landfall_indices = [
+                    (dense["ISO_TIME"] - landfall_time).abs().idxmin()
+                    for landfall_time in landfall_times
                 ]
-                crossing_vmax = float(dense.loc[crossing_indices, "USA_WIND"].max())
+                landfall_vmax = float(dense.loc[landfall_indices, "USA_WIND"].max())
                 closest_time, closest_crossing = min(
-                    episode_crossings,
+                    episode_landfalls,
                     key=lambda item: abs((item[0] - closest["ISO_TIME"]).total_seconds()),
                 )
                 minimum_distance_km = 0.0
@@ -364,10 +392,10 @@ def build_coastal_impact_catalog(
             if not selection.start <= closest_time <= selection.end:
                 continue
             qualifying_episode_index += 1
-            tier = _episode_tier(episode_contact, crossing_vmax)
+            tier = _episode_tier(episode_contact, landfall_vmax)
             methods: list[str] = []
-            if episode_contact["coastline_crossing"].any():
-                methods.append("coastline_crossing")
+            if episode_contact["landfall_crossing"].any():
+                methods.append("landfall_crossing")
             if episode_contact["r34_contact"].any():
                 methods.append("wind_radius")
             if episode_contact["distance_proxy_contact"].any():
@@ -395,9 +423,15 @@ def build_coastal_impact_catalog(
                         if pd.notna(closest["USA_WIND"])
                         else np.nan
                     ),
-                    "crossing_vmax_kt": crossing_vmax,
-                    "coastline_crossing": bool(episode_crossing_times),
-                    "crossing_count": len(episode_crossing_times),
+                    "crossing_vmax_kt": landfall_vmax,
+                    "landfall_vmax_kt": landfall_vmax,
+                    "coastline_crossing": bool(landfall_times),
+                    "crossing_count": len(landfall_times),
+                    "landfall_crossing": bool(landfall_times),
+                    "landfall_count": len(landfall_times),
+                    "coastline_exit": bool(episode_exits),
+                    "exit_count": len(episode_exits),
+                    "tangent_crossing_count": len(episode_tangents),
                     "r34_contact": bool(episode_contact["r34_contact"].any()),
                     "r50_contact": bool(episode_contact["r50_contact"].any()),
                     "r64_contact": bool(episode_contact["r64_contact"].any()),
@@ -411,6 +445,9 @@ def build_coastal_impact_catalog(
                     "tier": tier,
                     "primary_sample": tier in selection.primary_tiers,
                     "selection_method": "+".join(methods),
+                    "center_surface_at_closest_approach": (
+                        "coastline" if landfall_times else closest["surface_type"]
+                    ),
                     "nature_at_closest_approach": closest["NATURE"],
                     "usa_status_at_closest_approach": closest["USA_STATUS"],
                     "track_types": "+".join(track_types),

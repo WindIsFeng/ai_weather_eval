@@ -17,7 +17,10 @@ import shapefile
 from pyproj import Geod
 from scipy.optimize import minimize_scalar
 from scipy.spatial import cKDTree
-from shapely.geometry import LineString, Point
+from shapely import make_valid, points as shapely_points
+from shapely.geometry import LineString, Point, Polygon
+from shapely.geometry.base import BaseGeometry
+from shapely.strtree import STRtree
 
 
 WGS84_GEOD = Geod(ellps="WGS84")
@@ -57,6 +60,7 @@ class CoastCrossing:
     fraction: float
     latitude: float
     longitude: float
+    crossing_type: str = "unknown"
 
 
 class CoastlineIndex:
@@ -70,6 +74,7 @@ class CoastlineIndex:
         segment_latitude_b: np.ndarray,
         *,
         sample_spacing_km: float = 5.0,
+        land_geometries: Sequence[BaseGeometry] | None = None,
     ) -> None:
         if sample_spacing_km <= 0:
             raise ValueError("sample_spacing_km must be positive")
@@ -130,6 +135,10 @@ class CoastlineIndex:
         self.sample_longitudes = _as_float_array(sample_lon)
         self.sample_latitudes = _as_float_array(sample_lat)
         self._tree = cKDTree(_unit_sphere_xyz(self.sample_longitudes, self.sample_latitudes))
+        self._land_geometries = tuple(land_geometries or ())
+        self._land_tree = (
+            STRtree(self._land_geometries) if self._land_geometries else None
+        )
 
     @classmethod
     def from_segments(
@@ -137,6 +146,7 @@ class CoastlineIndex:
         segments: Iterable[tuple[float, float, float, float]],
         *,
         sample_spacing_km: float = 5.0,
+        land_geometries: Sequence[BaseGeometry] | None = None,
     ) -> "CoastlineIndex":
         """Build an index from ``(lon_a, lat_a, lon_b, lat_b)`` segments."""
 
@@ -149,6 +159,7 @@ class CoastlineIndex:
             segment_array[:, 2],
             segment_array[:, 3],
             sample_spacing_km=sample_spacing_km,
+            land_geometries=land_geometries,
         )
 
     @classmethod
@@ -171,6 +182,7 @@ class CoastlineIndex:
         latitude_a: list[float] = []
         longitude_b: list[float] = []
         latitude_b: list[float] = []
+        land_geometries: list[BaseGeometry] = []
         with shapefile.Reader(str(path)) as reader:
             field_names = [field.name for field in reader.fields[1:]]
             area_index = field_names.index("area") if "area" in field_names else None
@@ -187,6 +199,9 @@ class CoastlineIndex:
                         continue
                     if ring[0] != ring[-1]:
                         ring = [*ring, ring[0]]
+                    land_geometry = make_valid(Polygon(ring))
+                    if not land_geometry.is_empty:
+                        land_geometries.append(land_geometry)
                     for point_a, point_b in zip(ring[:-1], ring[1:], strict=True):
                         longitude_a.append(float(point_a[0]))
                         latitude_a.append(float(point_a[1]))
@@ -199,7 +214,33 @@ class CoastlineIndex:
             np.asarray(longitude_b),
             np.asarray(latitude_b),
             sample_spacing_km=sample_spacing_km,
+            land_geometries=land_geometries,
         )
+
+    def points_on_land(
+        self,
+        latitudes: Sequence[float] | np.ndarray,
+        longitudes: Sequence[float] | np.ndarray,
+    ) -> np.ndarray:
+        """Return whether each WGS84 coordinate is covered by a land polygon."""
+
+        if self._land_tree is None:
+            raise RuntimeError("Land/sea classification requires coastline polygons")
+        latitudes_array = _as_float_array(latitudes)
+        longitudes_array = _as_float_array(longitudes)
+        if latitudes_array.shape != longitudes_array.shape:
+            raise ValueError("latitudes and longitudes must have equal shape")
+        if not np.isfinite(latitudes_array).all() or not np.isfinite(longitudes_array).all():
+            raise ValueError("latitudes and longitudes must be finite")
+
+        query_points = shapely_points(
+            longitudes_array.ravel(), latitudes_array.ravel()
+        )
+        matches = self._land_tree.query(query_points, predicate="covered_by")
+        on_land = np.zeros(query_points.shape, dtype=bool)
+        if matches.size:
+            on_land[np.asarray(matches[0], dtype=np.int64)] = True
+        return on_land.reshape(latitudes_array.shape)
 
     def _candidate_segment_ids(self, latitude: float, longitude: float, k: int) -> np.ndarray:
         query_xyz = _unit_sphere_xyz(np.asarray([longitude]), np.asarray([latitude]))[0]
@@ -397,8 +438,8 @@ class CoastlineIndex:
                             longitude=float(crossing_lon),
                         )
                     )
-                    break
 
+        crossings.sort(key=lambda crossing: (crossing.track_segment_index, crossing.fraction))
         deduplicated: list[CoastCrossing] = []
         for crossing in crossings:
             if deduplicated:
@@ -430,4 +471,63 @@ class CoastlineIndex:
                     )
                     continue
             deduplicated.append(crossing)
-        return deduplicated
+
+        if self._land_tree is None or not deduplicated:
+            return deduplicated
+
+        classified: list[CoastCrossing] = []
+        by_segment: dict[int, list[CoastCrossing]] = {}
+        for crossing in deduplicated:
+            by_segment.setdefault(crossing.track_segment_index, []).append(crossing)
+        for track_segment_index, segment_crossings in by_segment.items():
+            lon_a = float(longitudes_array[track_segment_index])
+            lat_a = float(latitudes_array[track_segment_index])
+            lon_b = float(longitudes_array[track_segment_index + 1])
+            lat_b = float(latitudes_array[track_segment_index + 1])
+            track_azimuth, _, track_length_m = WGS84_GEOD.inv(
+                lon_a, lat_a, lon_b, lat_b
+            )
+            fractions = [crossing.fraction for crossing in segment_crossings]
+            for crossing_index, crossing in enumerate(segment_crossings):
+                previous_fraction = fractions[crossing_index - 1] if crossing_index else 0.0
+                next_fraction = (
+                    fractions[crossing_index + 1]
+                    if crossing_index + 1 < len(fractions)
+                    else 1.0
+                )
+                before_fraction = (previous_fraction + crossing.fraction) / 2.0
+                after_fraction = (crossing.fraction + next_fraction) / 2.0
+                before_lon, before_lat, _ = WGS84_GEOD.fwd(
+                    lon_a,
+                    lat_a,
+                    track_azimuth,
+                    track_length_m * before_fraction,
+                )
+                after_lon, after_lat, _ = WGS84_GEOD.fwd(
+                    lon_a,
+                    lat_a,
+                    track_azimuth,
+                    track_length_m * after_fraction,
+                )
+                before_land, after_land = self.points_on_land(
+                    [before_lat, after_lat], [before_lon, after_lon]
+                )
+                if not before_land and after_land:
+                    crossing_type = "landfall"
+                elif before_land and not after_land:
+                    crossing_type = "exit"
+                else:
+                    crossing_type = "tangent"
+                classified.append(
+                    CoastCrossing(
+                        track_segment_index=crossing.track_segment_index,
+                        fraction=crossing.fraction,
+                        latitude=crossing.latitude,
+                        longitude=crossing.longitude,
+                        crossing_type=crossing_type,
+                    )
+                )
+        return sorted(
+            classified,
+            key=lambda crossing: (crossing.track_segment_index, crossing.fraction),
+        )

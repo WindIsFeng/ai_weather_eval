@@ -14,6 +14,9 @@ case_selection:
   intensity_source: USA_WIND
   coordinate_source: [LAT, LON]
   distance_ellipsoid: WGS84
+  land_sea_classification: gshhg_level1_polygon
+  wind_radius_contact_requires_sea_center: true
+  crossing_direction: sea_to_land_only
   coastal_peak_threshold_kt: 64
   missing_radius_distance_km: 100
   episode_gap_hours: 6

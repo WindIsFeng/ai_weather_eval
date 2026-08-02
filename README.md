@@ -18,7 +18,8 @@ managed outside this repository.
   statistical uncertainty is clustered by `SID`.
 - **Distance:** Track-to-coast distance and crossings are computed directly
   against fixed GSHHG coastlines with WGS84 ellipsoidal geodesics. IBTrACS
-  `DIST2LAND` and `LANDFALL` are not used.
+  `DIST2LAND` and `LANDFALL` are not used. GSHHG land polygons classify every
+  track point as land or sea and distinguish landfall from coastal exit.
 - **Initializations:** Standard six-hourly forecast cycles near 24, 48, 72, 96,
   and 120 hours before observed landfall.
 - **Metrics:** Track, maximum wind, minimum sea-level pressure, landfall time,

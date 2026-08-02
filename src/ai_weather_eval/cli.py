@@ -142,6 +142,15 @@ def _catalog_summary(cases: pd.DataFrame, points: pd.DataFrame) -> dict[str, obj
         "final_main_primary_case_count": int(
             ((~cases["provisional_track"]) & cases["primary_sample"]).sum()
         ),
+        "landfall_case_count": int(cases["landfall_crossing"].sum()),
+        "sea_only_case_count": int((~cases["landfall_crossing"]).sum()),
+        "exit_associated_case_count": int(cases["coastline_exit"].sum()),
+        "primary_landfall_case_count": int(
+            (cases["primary_sample"] & cases["landfall_crossing"]).sum()
+        ),
+        "primary_sea_only_case_count": int(
+            (cases["primary_sample"] & ~cases["landfall_crossing"]).sum()
+        ),
         "tier_counts": counts("tier"),
         "basin_counts": counts("basin"),
         "selection_method_counts": counts("selection_method"),
@@ -179,6 +188,7 @@ def _storm_catalog(cases: pd.DataFrame) -> pd.DataFrame:
                     storm_cases["coastal_episode_vmax_kt"].max()
                 ),
                 "any_coastline_crossing": bool(storm_cases["coastline_crossing"].any()),
+                "any_coastline_exit": bool(storm_cases["coastline_exit"].any()),
                 "provisional_track": bool(storm_cases["provisional_track"].any()),
                 "qc_status": "pending",
             }
@@ -261,6 +271,10 @@ def _build_catalog(args: argparse.Namespace) -> int:
     manifest = {
         "created_at_utc": datetime.now(UTC).isoformat(),
         "distance_model": "WGS84 ellipsoidal geodesic (pyproj.Geod)",
+        "land_sea_model": (
+            "GSHHG level-1 polygon containment; wind-radius and distance-proxy "
+            "contacts require a sea-based storm center; crossings are directional"
+        ),
         "ibtracs": {
             "path": str(ibtracs_path),
             "version": ibtracs_config["version"],

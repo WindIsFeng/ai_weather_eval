@@ -1,6 +1,7 @@
 import unittest
 
 import pandas as pd
+from shapely.geometry import Polygon
 
 from ai_weather_eval.catalog.coastal_impact import (
     CoastalImpactSelection,
@@ -37,8 +38,16 @@ def _storm_frame(*, radius_nmile: float | None = 100.0) -> pd.DataFrame:
 
 class CoastalImpactCatalogTests(unittest.TestCase):
     def setUp(self) -> None:
+        land = Polygon([(0.0, -10.0), (10.0, -10.0), (10.0, 10.0), (0.0, 10.0)])
         self.coastline = CoastlineIndex.from_segments(
-            [(0.0, -10.0, 0.0, 10.0)], sample_spacing_km=5.0
+            [
+                (0.0, -10.0, 10.0, -10.0),
+                (10.0, -10.0, 10.0, 10.0),
+                (10.0, 10.0, 0.0, 10.0),
+                (0.0, 10.0, 0.0, -10.0),
+            ],
+            sample_spacing_km=5.0,
+            land_geometries=[land],
         )
         self.selection = CoastalImpactSelection(
             start=pd.Timestamp("2022-01-01T00:00:00Z"),
@@ -53,6 +62,7 @@ class CoastalImpactCatalogTests(unittest.TestCase):
         self.assertEqual(cases.loc[0, "tier"], "A")
         self.assertTrue(cases.loc[0, "primary_sample"])
         self.assertTrue(cases.loc[0, "coastline_crossing"])
+        self.assertTrue(cases.loc[0, "landfall_crossing"])
         self.assertEqual(cases.loc[0, "minimum_coast_distance_km"], 0.0)
         self.assertFalse(points.empty)
 
@@ -68,6 +78,15 @@ class CoastalImpactCatalogTests(unittest.TestCase):
         storm["USA_WIND"] = 60.0
         cases, _ = build_coastal_impact_catalog(storm, self.coastline, self.selection)
         self.assertTrue(cases.empty)
+
+    def test_inland_near_coast_does_not_create_contact(self) -> None:
+        storm = _storm_frame()
+        storm["LON"] = [0.1, 0.2]
+        cases, points = build_coastal_impact_catalog(
+            storm, self.coastline, self.selection
+        )
+        self.assertTrue(cases.empty)
+        self.assertTrue(points["is_land"].all())
 
 if __name__ == "__main__":
     unittest.main()
