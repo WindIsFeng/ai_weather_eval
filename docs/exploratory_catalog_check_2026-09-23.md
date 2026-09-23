@@ -55,3 +55,23 @@ The exact exploratory IBTrACS input is preserved at
 `data/raw/ibtracs/ibtracs_recent_exploratory.csv`. These data and generated
 tables are ignored by Git, so a fresh clone must regenerate or receive them
 separately. They are exploratory results, not the publication catalog.
+
+When loading these CSVs with pandas, use
+`pd.read_csv(path, keep_default_na=False, na_values=[""])`. The North Atlantic
+basin code is `NA`, which pandas otherwise interprets as a missing value.
+
+## Publication-readiness check
+
+Re-running the current selector on the preserved exploratory IBTrACS input and
+the GSHHG 2.3.7 shoreline reproduced the same 152 coastal-event IDs and 114
+A+B event IDs. The 114 selected rows have no missing event IDs, storm IDs,
+basin codes, reference times, coordinates, or tiers; event IDs are unique, and
+all 570 forecast-case IDs are unique and link to the 114 selected events.
+
+The sample is still a candidate for the formal catalog: all 114 rows have
+`qc_status=pending`, and the preserved September 2026 IBTrACS extract differs
+from the full July 2026 file pinned in `configs/datasets/ibtracs.yaml`.
+Before treating the cohort as final, choose and freeze one IBTrACS revision,
+align the dataset configuration and manifest with that exact source, rerun the
+catalog, and complete case-level quality control of coastal contacts and
+landfall anchors. Record any exclusions or corrections in a versioned audit.
