@@ -17,7 +17,10 @@
     "local_study_range_sha256": "290b57e7d353b5a7db6bab9ea818144f4cb835c58e17a7d4a5bd7ca0fe65d028",
     "local_study_range_rows": 38205,
     "local_study_range_time_start": "2020-09-10T06:00:00Z",
-    "local_study_range_time_end": "2026-09-22T00:00:00Z"
+    "local_study_range_time_end": "2026-09-22T00:00:00Z",
+    "tracked_compressed_path": "data/frozen_sources/ibtracs.since1980.2026-09-22.study_range.csv.gz",
+    "tracked_compressed_bytes": 1601653,
+    "tracked_compressed_sha256": "9d04b47b18253bcac4068f5152bc7c4a1006b38ba0bfc0e66838e7502616e869"
   },
   "gshhg": {
     "version": "2.3.7",
@@ -68,5 +71,6 @@
       "bytes": 20129,
       "sha256": "330a3ac6d8d854914207d7c63e6cb969434f52644f3dd1082717ca43e148a2dd"
     }
-  }
+  },
+  "restore_script_sha256": "207482e544d9fdae37a2a45c88d1ec0521f9a586f1dd88a2cf1bf86128388888"
 }

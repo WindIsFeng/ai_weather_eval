@@ -26,8 +26,10 @@ Wind-radius contact represents potential coastal exposure, not observed damage.
 
 The exact local paths, configuration hashes, QC script hash, table hashes, and
 row counts are in [the release manifest](../data/manifests/coastal_catalog_2022_2024_v2026-09-22.json).
-Large frozen source files are under ignored `data/raw/`; the small approved
-tables are tracked in [data/catalogs](../data/catalogs/README.md).
+The exact NOAA study extract is also tracked as a 1.6 MB
+[compressed frozen source](../data/frozen_sources/README.md). The large GSHHG
+archive remains under ignored `data/raw/`; the approved tables are tracked in
+[data/catalogs](../data/catalogs/README.md).
 
 ## Selection and QC
 
@@ -68,12 +70,18 @@ independent storms.
 ## Reproduce locally
 
 Set the data root to this project's ignored `data/` directory, or stage the
-same checksum-verified sources in another root. The fixed inputs are required;
-a fresh clone contains the approved small tables but not the raw files.
-Choose a new, unused output directory for each rebuild.
+same checksum-verified sources in another root. A fresh clone contains the
+approved tables and the compressed NOAA extract. Download the fixed GSHHG
+archive and run the restore helper before rebuilding. Choose a new, unused
+output directory for each rebuild.
 
 ```bash
 export AI_WEATHER_EVAL_DATA="$(pwd)/data"
+mkdir -p data/raw/coastline/gshhg/2.3.7
+curl -fL https://ftp.soest.hawaii.edu/gshhg/gshhg-shp-2.3.7.zip \
+  -o data/raw/coastline/gshhg/2.3.7/gshhg-shp-2.3.7.zip
+conda run --name ai-weather-eval python scripts/restore_frozen_coastal_sources.py \
+  --data-root data
 conda run --name ai-weather-eval python -m ai_weather_eval.cli catalog build \
   --config configs/experiments/global_landfall_2022_2024.yaml \
   --output-dir outputs/coastal_catalog_rebuild_20260923

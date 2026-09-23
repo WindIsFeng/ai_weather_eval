@@ -95,7 +95,7 @@ incremental implementation.
 ## Repository Layout
 
 - `configs/`: Dataset, model, experiment, and figure configuration.
-- `data/`: Data documentation, manifests, versioned small research catalogs, and test samples.
+- `data/`: Data documentation, manifests, versioned small research catalogs, a compressed frozen source extract, and test samples.
 - `src/ai_weather_eval/`: Tested production code.
 - `tests/`: Unit tests, integration tests, and compact fixtures.
 - `notebooks/`: Exploration, manual quality control, and artifact review; core
