@@ -19,10 +19,11 @@
 - Commit directly to `main` unless the user explicitly requests a branch.
 - Use the configured Git remote and any suitable authenticated transport; the
   GitHub CLI may be used when available and authenticated.
+- Commit automatically after finishing key tasks.
 
 ## Figure defaults
 
-- Export figures at 300 DPI in TIFF (`.tif`) format unless the user explicitly
+- Export figures at 600 DPI in TIFF (`.tif`) format unless the user explicitly
   requests another resolution or format.
 - Use Arial at 16 pt for all figure text. If Arial is unavailable on the host,
   use Liberation Sans as the metric-compatible fallback.
