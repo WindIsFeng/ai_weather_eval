@@ -1,8 +1,10 @@
 dataset: gshhg
 role: coastal_distance_and_crossing
 version: 2.3.7
+source_url: https://ftp.soest.hawaii.edu/gshhg/gshhg-shp-2.3.7.zip
 path: ${AI_WEATHER_EVAL_DATA}/raw/coastline/gshhg/2.3.7/GSHHS_shp/i/GSHHS_i_L1.shp
 archive_path: ${AI_WEATHER_EVAL_DATA}/raw/coastline/gshhg/2.3.7/gshhg-shp-2.3.7.zip
+archive_bytes: 149157845
 archive_sha256: 8dbbe7e071e77e9e75f2d639239099ebca8d5c16d6a07df8169729d49f15cf41
 resolution: intermediate
 level: 1

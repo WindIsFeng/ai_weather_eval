@@ -1,0 +1,72 @@
+{
+  "release_id": "coastal-impact-2022-2024-ibtracs-v04r01-2026-09-22-gshhg-2.3.7",
+  "created_at_utc": "2026-09-23T10:08:39.956543+00:00",
+  "status": "frozen_qc_passed_primary_cohort",
+  "population": "2022-2024 final main-track A+B coastal-contact episodes, USA_WIND >=64 kt within episode +/-6 h",
+  "ibtracs": {
+    "version": "v04r01",
+    "source_url": "https://www.ncei.noaa.gov/data/international-best-track-archive-for-climate-stewardship-ibtracs/v04r01/access/csv/ibtracs.since1980.list.v04r01.csv",
+    "source_last_modified_utc": "2026-09-22 08:57:07+00:00",
+    "source_etag": "\"895c23c-65c0e8d203a37\"",
+    "source_content_length_bytes": 144032316,
+    "source_byte_range": [
+      126000000,
+      144032315
+    ],
+    "local_study_range_path": "data/raw/ibtracs/ibtracs.since1980.2026-09-22.study_range.csv",
+    "local_study_range_sha256": "290b57e7d353b5a7db6bab9ea818144f4cb835c58e17a7d4a5bd7ca0fe65d028",
+    "local_study_range_rows": 38205,
+    "local_study_range_time_start": "2020-09-10T06:00:00Z",
+    "local_study_range_time_end": "2026-09-22T00:00:00Z"
+  },
+  "gshhg": {
+    "version": "2.3.7",
+    "resolution": "intermediate",
+    "level": 1,
+    "archive_path": "data/raw/coastline/gshhg/2.3.7/gshhg-shp-2.3.7.zip",
+    "archive_sha256": "8dbbe7e071e77e9e75f2d639239099ebca8d5c16d6a07df8169729d49f15cf41",
+    "source_url": "https://ftp.soest.hawaii.edu/gshhg/gshhg-shp-2.3.7.zip",
+    "archive_bytes": 149157845
+  },
+  "configuration_sha256": {
+    "configs/datasets/ibtracs.yaml": "f9f52f7772dca65ac209ef5c09243ea6f63e4c1ca3a195e06079b7aa8499629a",
+    "configs/datasets/coastline.yaml": "4142a9ecdef34fc239e29b178f8b7f9cc2ed995841d300fe8af07fd6d65d393b",
+    "configs/experiments/global_landfall_2022_2024.yaml": "efac030e143068078bf022ac8ce199a402293f9d152809861affa76060c2febc"
+  },
+  "qc_script_sha256": "49d937a0bbcb5d69f3232a998f5872b5a0e78d31c10388c2eb7e88ec1d7d06c6",
+  "qc_summary": {
+    "ibtracs_sha256": "290b57e7d353b5a7db6bab9ea818144f4cb835c58e17a7d4a5bd7ca0fe65d028",
+    "gshhg_archive_sha256": "8dbbe7e071e77e9e75f2d639239099ebca8d5c16d6a07df8169729d49f15cf41",
+    "all_case_count": 155,
+    "selected_case_count": 114,
+    "passed_case_count": 114,
+    "failed_case_count": 0,
+    "cases_with_review_notes": 38,
+    "maximum_landfall_anchor_coast_distance_km": 0.29321786475164807,
+    "note_counts": {
+      "multiple_landfalls": 15,
+      "limited_r34_coverage": 11,
+      "limited_wind_coverage": 4,
+      "anchor_within_six_hour_padding": 16,
+      "distant_wind_radius_contact": 3
+    },
+    "failure_counts": {}
+  },
+  "artifacts": {
+    "data/catalogs/coastal_impact_events_2022_2024_v2026-09-22.csv": {
+      "rows": 114,
+      "bytes": 51725,
+      "sha256": "6deeac85ab0980935b98389612d4da73411a333d3863365aa899b6ef5bd9d876"
+    },
+    "data/catalogs/coastal_impact_forecast_cases_2022_2024_v2026-09-22.csv": {
+      "rows": 570,
+      "bytes": 134189,
+      "sha256": "5caafbd202bf85560e1a4ebe96834a67aefd52d734a1cb612a7fe62b1a993443"
+    },
+    "data/catalogs/coastal_impact_qc_2022_2024_v2026-09-22.csv": {
+      "rows": 114,
+      "bytes": 20129,
+      "sha256": "330a3ac6d8d854914207d7c63e6cb969434f52644f3dd1082717ca43e148a2dd"
+    }
+  }
+}

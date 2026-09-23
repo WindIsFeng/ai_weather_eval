@@ -17,8 +17,9 @@ The NOAA source had `Last-Modified: Tue, 22 Sep 2026 08:57:07 GMT` and ETag
 The source metadata and byte interval are recorded in
 `data/raw/ibtracs/ibtracs_2023_2024_range.json`. Range requests were guarded
 with the source ETag and checked for exact length. This is an extract of the
-2026-09-22 revision, **not** the 2026-07-28 file pinned by
-`configs/datasets/ibtracs.yaml`.
+2026-09-22 revision. At the time of this WN-C run, the coastal-catalog
+configuration still pinned a 2026-07-28 file; it now pins a separate frozen
+study-range extract of the 2026-09-22 revision.
 
 Weather Lab files follow this URL pattern:
 

@@ -28,10 +28,10 @@
 | `tier` | 沿海影响层级 A、B、C 或 D |
 | `primary_sample` | 是否属于主样本（A+B） |
 | `provisional_track` | 是否含非 `main` 轨迹 |
-| `qc_status` | `pending`、`accepted`、`corrected` 或 `excluded` |
+| `qc_status` | 工作流初始输出为 `pending`；版本化主样本逐事件质检后为 `passed`，未通过为 `failed` |
 
 CSV 中的北大西洋代码为字面值 `NA`。使用 pandas 读取时应设置
-`keep_default_na=False`，避免将该海盆代码误认为缺测值。
+`keep_default_na=False, na_values=[""]`，既保留 `NA`，也将真正的空白视为缺测值。
 
 ## Storm table
 

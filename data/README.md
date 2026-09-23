@@ -1,6 +1,7 @@
 # Data contract
 
-本目录不保存真实气象数据。设置 `AI_WEATHER_EVAL_DATA` 后，外部数据根目录采用：
+本目录的 `catalogs/` 保存小型、经质检的版本化事件与预报案例表；大型原始气象数据
+仍不纳入 Git。设置 `AI_WEATHER_EVAL_DATA` 后，数据根目录采用：
 
 ```text
 $AI_WEATHER_EVAL_DATA/
@@ -26,5 +27,5 @@ $AI_WEATHER_EVAL_DATA/
 - `interim/` 可以重建，保存规范化和计算代价较高的中间产物。
 - `processed/` 保存可直接进入统计与绘图的整洁表。
 - 每个原始数据集都要在 `data/manifests/` 登记版本、来源和校验和。
-- 仓库只允许在 `data/samples/` 中保存经过裁剪且不敏感的小型测试数据。
-
+- `data/catalogs/` 保存经质检、带来源清单的小型正式研究样本，并纳入 Git。
+- `data/samples/` 只保存经过裁剪且不敏感的小型测试数据。

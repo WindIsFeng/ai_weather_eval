@@ -1,10 +1,14 @@
 dataset: ibtracs
 role: best_track
 version: v04r01
-subset: since1980
-source_last_modified_utc: 2026-07-28T08:55:00Z
-path: ${AI_WEATHER_EVAL_DATA}/raw/ibtracs/ibtracs.since1980.list.v04r01.csv
-sha256: 110faa2fe647368c4b89e063ddd70543ecd7606a81671e74ff6cd3c883e4a44b
+subset: since1980_study_range
+source_last_modified_utc: 2026-09-22T08:57:07Z
+source_url: https://www.ncei.noaa.gov/data/international-best-track-archive-for-climate-stewardship-ibtracs/v04r01/access/csv/ibtracs.since1980.list.v04r01.csv
+source_etag: '"895c23c-65c0e8d203a37"'
+source_content_length_bytes: 144032316
+source_byte_range: [126000000, 144032315]
+path: ${AI_WEATHER_EVAL_DATA}/raw/ibtracs/ibtracs.since1980.2026-09-22.study_range.csv
+sha256: 290b57e7d353b5a7db6bab9ea818144f4cb835c58e17a7d4a5bd7ca0fe65d028
 storm_id_variable: SID
 time_variable: ISO_TIME
 latitude_variable: LAT

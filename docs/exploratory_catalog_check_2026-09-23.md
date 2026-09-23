@@ -1,9 +1,11 @@
 # Exploratory catalog check — 2026-09-23
 
-This check exercises the event selector and forecast-case planner against recent
-official best tracks. It is **not** the publication catalog: the experiment
-configuration pins an IBTrACS file downloaded on 2026-07-28, while this check
-uses the current official file modified on 2026-09-22.
+This historical check exercised the event selector and forecast-case planner
+against recent official best tracks. At the time, the experiment configuration
+pinned an IBTrACS file downloaded on 2026-07-28, while this check used the
+official file modified on 2026-09-22. The September source was subsequently
+frozen and quality checked as the versioned research cohort; see
+[`coastal_catalog_release_2026-09-22.md`](coastal_catalog_release_2026-09-22.md).
 
 ## Inputs and method
 
@@ -37,9 +39,8 @@ uses the current official file modified on 2026-09-22.
 
 All cases have reference years in 2022–2024 (45, 59, and 48 events by year).
 The exploratory run uses no model forecasts or ERA5 fields and therefore does
-not estimate model skill. Rebuild and audit the formal catalog using the full
-IBTrACS file with the SHA-256 pinned in `configs/datasets/ibtracs.yaml` before
-publication.
+not estimate model skill. The subsequent release uses a frozen study-range
+extract of the same September revision and a separate case-level audit.
 
 ## Saved results
 
@@ -53,8 +54,8 @@ The exploratory tables are preserved under `outputs/coastal_catalog_2022_2024/`:
 
 The exact exploratory IBTrACS input is preserved at
 `data/raw/ibtracs/ibtracs_recent_exploratory.csv`. These data and generated
-tables are ignored by Git, so a fresh clone must regenerate or receive them
-separately. They are exploratory results, not the publication catalog.
+tables are ignored by Git. The QC-approved, versioned research cohort is now
+tracked under `data/catalogs/`; use that version for analysis.
 
 When loading these CSVs with pandas, use
 `pd.read_csv(path, keep_default_na=False, na_values=[""])`. The North Atlantic
@@ -68,10 +69,7 @@ A+B event IDs. The 114 selected rows have no missing event IDs, storm IDs,
 basin codes, reference times, coordinates, or tiers; event IDs are unique, and
 all 570 forecast-case IDs are unique and link to the 114 selected events.
 
-The sample is still a candidate for the formal catalog: all 114 rows have
-`qc_status=pending`, and the preserved September 2026 IBTrACS extract differs
-from the full July 2026 file pinned in `configs/datasets/ibtracs.yaml`.
-Before treating the cohort as final, choose and freeze one IBTrACS revision,
-align the dataset configuration and manifest with that exact source, rerun the
-catalog, and complete case-level quality control of coastal contacts and
-landfall anchors. Record any exclusions or corrections in a versioned audit.
+This section records the pre-release state: all 114 exploratory rows still had
+`qc_status=pending`. The subsequent September release froze the source,
+rebuilt the catalog, and completed case-level quality checks. The approved
+tables and audit are under `data/catalogs/`.

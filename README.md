@@ -33,6 +33,12 @@ managed outside this repository.
 
 See [docs/methodology.md](docs/methodology.md) for the detailed methodology.
 
+The frozen 2022–2024 main-track A+B cohort contains 114 quality-checked coastal
+episodes from 83 storms. Its versioned event table, forecast-case plan, and
+case-level QC audit are in [data/catalogs/](data/catalogs/README.md); source
+revision and limitations are recorded in the
+[release note](docs/coastal_catalog_release_2026-09-22.md).
+
 ## Getting Started
 
 All project work must use the existing `ai-weather-eval` Conda environment,
@@ -69,11 +75,11 @@ export AI_WEATHER_EVAL_DATA=/path/to/ai_weather_eval_data
 weather-eval config check --config configs/experiments/global_landfall_2022_2024.yaml
 weather-eval catalog build \
   --config configs/experiments/global_landfall_2022_2024.yaml \
-  --output-dir outputs/coastal_catalog_2022_2024
+  --output-dir outputs/coastal_catalog_my_run
 weather-eval catalog plan \
   --config configs/experiments/global_landfall_2022_2024.yaml \
-  --cases-file outputs/coastal_catalog_2022_2024/final_main_primary_coastal_impact_cases.csv \
-  --output outputs/coastal_catalog_2022_2024/forecast_cases.csv
+  --cases-file data/catalogs/coastal_impact_events_2022_2024_v2026-09-22.csv \
+  --output outputs/coastal_catalog_my_run/forecast_cases.csv
 weather-eval --help
 ```
 
@@ -89,7 +95,7 @@ incremental implementation.
 ## Repository Layout
 
 - `configs/`: Dataset, model, experiment, and figure configuration.
-- `data/`: Data documentation, manifests, and small test samples only.
+- `data/`: Data documentation, manifests, versioned small research catalogs, and test samples.
 - `src/ai_weather_eval/`: Tested production code.
 - `tests/`: Unit tests, integration tests, and compact fixtures.
 - `notebooks/`: Exploration, manual quality control, and artifact review; core
