@@ -40,3 +40,18 @@ The exploratory run uses no model forecasts or ERA5 fields and therefore does
 not estimate model skill. Rebuild and audit the formal catalog using the full
 IBTrACS file with the SHA-256 pinned in `configs/datasets/ibtracs.yaml` before
 publication.
+
+## Saved results
+
+The exploratory tables are preserved under `outputs/coastal_catalog_2022_2024/`:
+
+- `final_main_primary_coastal_impact_cases.csv`: the 114 A+B events, including
+  event IDs, reference times, latitude, and longitude.
+- `coastal_impact_cases.csv`: all 152 coastal-contact events.
+- `forecast_cases.csv`: the 570 planned forecast cases for the A+B events.
+- `manifest.json`: counts, source provenance, and file checksums.
+
+The exact exploratory IBTrACS input is preserved at
+`data/raw/ibtracs/ibtracs_recent_exploratory.csv`. These data and generated
+tables are ignored by Git, so a fresh clone must regenerate or receive them
+separately. They are exploratory results, not the publication catalog.
