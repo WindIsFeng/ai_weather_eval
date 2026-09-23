@@ -1,8 +1,7 @@
 model: pangu_weather
 adapter: generic_xarray
-enabled: true
+enabled: false
 path_template: ${AI_WEATHER_EVAL_DATA}/raw/forecasts/pangu_weather/{init_time:%Y%m%d%H}.nc
 format: netcdf
 coordinate_mapping: {init_time: init_time, lead_time: lead_time, latitude: latitude, longitude: longitude}
 variable_mapping: {msl: msl, u10: u10, v10: v10, z500: z500, u850: u850, v850: v850, u200: u200, v200: v200}
-

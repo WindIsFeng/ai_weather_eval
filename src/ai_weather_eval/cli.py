@@ -24,6 +24,7 @@ from ai_weather_eval.catalog.ibtracs import (
     select_track_types,
 )
 from ai_weather_eval.config import ConfigError, load_yaml, validate_experiment
+from ai_weather_eval.preprocessing.forecast_matching import build_forecast_case_schedule
 
 
 def _add_workflow_command(subparsers: argparse._SubParsersAction, name: str, help_text: str) -> None:
@@ -56,6 +57,13 @@ def build_parser() -> argparse.ArgumentParser:
         help="New output directory; defaults to the external interim case-catalog store",
     )
     catalog_build.set_defaults(handler=_build_catalog)
+    catalog_plan = catalog_subparsers.add_parser(
+        "plan", help="Design event-relative forecast cases from a coastal catalog"
+    )
+    catalog_plan.add_argument("--config", type=Path, required=True)
+    catalog_plan.add_argument("--cases-file", type=Path, required=True)
+    catalog_plan.add_argument("--output", type=Path, required=True)
+    catalog_plan.set_defaults(handler=_plan_forecast_cases)
 
     _add_workflow_command(subparsers, "ingest", "Normalize model forecast files")
     _add_workflow_command(subparsers, "verify", "Compute case-level verification metrics")
@@ -152,6 +160,7 @@ def _catalog_summary(cases: pd.DataFrame, points: pd.DataFrame) -> dict[str, obj
             (cases["primary_sample"] & ~cases["landfall_crossing"]).sum()
         ),
         "tier_counts": counts("tier"),
+        "reference_event_counts": counts("reference_event"),
         "basin_counts": counts("basin"),
         "selection_method_counts": counts("selection_method"),
         "dense_track_point_count": int(len(points)),
@@ -299,6 +308,26 @@ def _build_catalog(args: argparse.Namespace) -> int:
 
     print(f"Built coastal-impact catalog: {output_dir}")
     print(json.dumps(summary, ensure_ascii=False, indent=2))
+    return 0
+
+
+def _plan_forecast_cases(args: argparse.Namespace) -> int:
+    config = load_yaml(args.config)
+    validate_experiment(config)
+    sampling = config["forecast_sampling"]
+    cases = pd.read_csv(args.cases_file, keep_default_na=False)
+    try:
+        schedule = build_forecast_case_schedule(
+            cases,
+            nominal_lead_hours=sampling["nominal_lead_hours"],
+            standard_cycle_hours_utc=sampling["standard_cycle_hours_utc"],
+            maximum_cycle_offset_hours=sampling["maximum_cycle_offset_hours"],
+        )
+    except ValueError as exc:
+        raise ConfigError(str(exc)) from exc
+    args.output.parent.mkdir(parents=True, exist_ok=True)
+    schedule.to_csv(args.output, index=False)
+    print(f"Planned {len(schedule)} forecast cases: {args.output}")
     return 0
 
 

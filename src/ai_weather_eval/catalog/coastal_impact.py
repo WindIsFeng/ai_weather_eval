@@ -344,6 +344,7 @@ def build_coastal_impact_catalog(
 
             closest_index = episode_contact["coast_distance_km"].idxmin()
             closest = dense.loc[closest_index]
+            closest_approach_time = closest["ISO_TIME"]
             episode_landfalls = [
                 (time, crossing)
                 for time, crossing in crossing_records
@@ -370,26 +371,28 @@ def build_coastal_impact_catalog(
                     for landfall_time in landfall_times
                 ]
                 landfall_vmax = float(dense.loc[landfall_indices, "USA_WIND"].max())
-                closest_time, closest_crossing = min(
-                    episode_landfalls,
-                    key=lambda item: abs((item[0] - closest["ISO_TIME"]).total_seconds()),
+                reference_time, reference_crossing = min(
+                    episode_landfalls, key=lambda item: item[0]
                 )
                 minimum_distance_km = 0.0
-                nearest_crossing_index = (dense["ISO_TIME"] - closest_time).abs().idxmin()
-                closest = dense.loc[nearest_crossing_index]
-                closest_latitude = closest_crossing.latitude
-                closest_longitude = closest_crossing.longitude
-                nearest_coast_latitude = closest_crossing.latitude
-                nearest_coast_longitude = closest_crossing.longitude
+                nearest_crossing_index = (dense["ISO_TIME"] - reference_time).abs().idxmin()
+                reference_point = dense.loc[nearest_crossing_index]
+                reference_latitude = reference_crossing.latitude
+                reference_longitude = reference_crossing.longitude
+                nearest_coast_latitude = reference_crossing.latitude
+                nearest_coast_longitude = reference_crossing.longitude
+                reference_event = "landfall"
             else:
-                closest_time = closest["ISO_TIME"]
+                reference_time = closest_approach_time
+                reference_point = closest
                 minimum_distance_km = float(closest["coast_distance_km"])
-                closest_latitude = float(closest["LAT"])
-                closest_longitude = float(closest["LON"])
+                reference_latitude = float(closest["LAT"])
+                reference_longitude = float(closest["LON"])
                 nearest_coast_latitude = float(closest["nearest_coast_latitude"])
                 nearest_coast_longitude = float(closest["nearest_coast_longitude"])
+                reference_event = "coastal_approach"
 
-            if not selection.start <= closest_time <= selection.end:
+            if not selection.start <= reference_time <= selection.end:
                 continue
             qualifying_episode_index += 1
             tier = _episode_tier(episode_contact, landfall_vmax)
@@ -405,14 +408,16 @@ def build_coastal_impact_catalog(
                 {
                     "case_id": f"{storm_id}-CE{qualifying_episode_index:02d}",
                     "storm_id": storm_id,
-                    "name": closest["NAME"],
-                    "basin": closest["BASIN"],
+                    "name": reference_point["NAME"],
+                    "basin": reference_point["BASIN"],
                     "episode_index": qualifying_episode_index,
                     "episode_start": episode_start,
                     "episode_end": episode_end,
-                    "closest_approach_time": closest_time,
-                    "latitude": closest_latitude,
-                    "longitude": closest_longitude,
+                    "closest_approach_time": closest_approach_time,
+                    "reference_time": reference_time,
+                    "reference_event": reference_event,
+                    "latitude": reference_latitude,
+                    "longitude": reference_longitude,
                     "nearest_coast_latitude": nearest_coast_latitude,
                     "nearest_coast_longitude": nearest_coast_longitude,
                     "minimum_coast_distance_km": minimum_distance_km,
@@ -421,6 +426,11 @@ def build_coastal_impact_catalog(
                     "closest_approach_vmax_kt": (
                         float(closest["USA_WIND"])
                         if pd.notna(closest["USA_WIND"])
+                        else np.nan
+                    ),
+                    "reference_vmax_kt": (
+                        float(reference_point["USA_WIND"])
+                        if pd.notna(reference_point["USA_WIND"])
                         else np.nan
                     ),
                     "crossing_vmax_kt": landfall_vmax,
@@ -445,11 +455,14 @@ def build_coastal_impact_catalog(
                     "tier": tier,
                     "primary_sample": tier in selection.primary_tiers,
                     "selection_method": "+".join(methods),
-                    "center_surface_at_closest_approach": (
-                        "coastline" if landfall_times else closest["surface_type"]
+                    "center_surface_at_closest_approach": closest["surface_type"],
+                    "center_surface_at_reference": (
+                        "coastline" if landfall_times else reference_point["surface_type"]
                     ),
                     "nature_at_closest_approach": closest["NATURE"],
                     "usa_status_at_closest_approach": closest["USA_STATUS"],
+                    "nature_at_reference": reference_point["NATURE"],
+                    "usa_status_at_reference": reference_point["USA_STATUS"],
                     "track_types": "+".join(track_types),
                     "provisional_track": any(
                         track_type.lower() != "main" for track_type in track_types
@@ -472,7 +485,7 @@ def build_coastal_impact_catalog(
     case_frame = pd.DataFrame(cases)
     if not case_frame.empty:
         case_frame = case_frame.sort_values(
-            ["closest_approach_time", "storm_id", "episode_index"], kind="stable"
+            ["reference_time", "storm_id", "episode_index"], kind="stable"
         ).reset_index(drop=True)
     point_frame = pd.concat(point_frames, ignore_index=True) if point_frames else pd.DataFrame()
     return case_frame, point_frame

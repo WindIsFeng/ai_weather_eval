@@ -18,7 +18,12 @@ class ConfigTests(unittest.TestCase):
         with self.assertRaises(ConfigError):
             validate_experiment(config)
 
+    def test_missing_cycles_are_rejected(self) -> None:
+        config = load_yaml(FIXTURE)
+        del config["forecast_sampling"]["standard_cycle_hours_utc"]
+        with self.assertRaises(ConfigError):
+            validate_experiment(config)
+
 
 if __name__ == "__main__":
     unittest.main()
-

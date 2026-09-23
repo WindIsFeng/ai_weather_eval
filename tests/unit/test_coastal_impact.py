@@ -63,8 +63,43 @@ class CoastalImpactCatalogTests(unittest.TestCase):
         self.assertTrue(cases.loc[0, "primary_sample"])
         self.assertTrue(cases.loc[0, "coastline_crossing"])
         self.assertTrue(cases.loc[0, "landfall_crossing"])
+        self.assertEqual(cases.loc[0, "reference_event"], "landfall")
+        self.assertLessEqual(
+            abs(cases.loc[0, "reference_time"] - pd.Timestamp("2022-01-01T01:30:00Z")),
+            pd.Timedelta(seconds=1),
+        )
         self.assertEqual(cases.loc[0, "minimum_coast_distance_km"], 0.0)
         self.assertFalse(points.empty)
+
+    def test_non_landfall_uses_closest_coastal_approach(self) -> None:
+        storm = _storm_frame()
+        storm["LON"] = [-2.0, -1.0]
+        cases, _ = build_coastal_impact_catalog(storm, self.coastline, self.selection)
+        self.assertEqual(len(cases), 1)
+        self.assertFalse(cases.loc[0, "landfall_crossing"])
+        self.assertEqual(cases.loc[0, "reference_event"], "coastal_approach")
+        self.assertEqual(cases.loc[0, "reference_time"], cases.loc[0, "closest_approach_time"])
+
+    def test_first_landfall_is_reference_when_episode_has_two(self) -> None:
+        storm = pd.concat([_storm_frame()] * 2, ignore_index=True)
+        storm["ISO_TIME"] = pd.to_datetime(
+            [
+                "2022-01-01T00:00:00Z",
+                "2022-01-01T03:00:00Z",
+                "2022-01-01T06:00:00Z",
+                "2022-01-01T09:00:00Z",
+            ],
+            utc=True,
+        )
+        storm["LON"] = [-1.0, 1.0, -1.0, 1.0]
+        storm["SOURCE_ROW"] = range(4)
+        cases, _ = build_coastal_impact_catalog(storm, self.coastline, self.selection)
+        self.assertEqual(len(cases), 1)
+        self.assertEqual(cases.loc[0, "landfall_count"], 2)
+        self.assertLessEqual(
+            abs(cases.loc[0, "reference_time"] - pd.Timestamp("2022-01-01T01:30:00Z")),
+            pd.Timedelta(seconds=1),
+        )
 
     def test_missing_radii_use_distance_proxy(self) -> None:
         cases, _ = build_coastal_impact_catalog(

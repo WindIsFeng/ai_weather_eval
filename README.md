@@ -1,8 +1,11 @@
 # AI Weather Evaluation
 
 This project evaluates how well AI weather models, including Pangu-Weather,
-FengWu, FuXi, GraphCast, and Aurora, predict tropical cyclones with substantial
-coastal wind exposure worldwide during 2022–2024.
+FengWu, FuXi, GraphCast, and Aurora, predict global tropical-cyclone events
+with potential coastal wind exposure during 2022–2024. A qualifying event has
+IBTrACS `USA_WIND` of at least 64 kt within the coastal-contact episode or six
+hours on either side; this one-minute-wind threshold defines the study's
+"severe tropical cyclone" sample.
 
 This repository contains case management, model-output adapters, verification,
 statistical analysis, and plotting code. Model inference and large datasets are
@@ -21,9 +24,10 @@ managed outside this repository.
   `DIST2LAND` and `LANDFALL` are not used. GSHHG land polygons classify every
   track point as land or sea and distinguish landfall from coastal exit.
 - **Initializations:** Standard six-hourly forecast cycles near 24, 48, 72, 96,
-  and 120 hours before observed landfall.
-- **Metrics:** Track, maximum wind, minimum sea-level pressure, landfall time,
-  location and intensity, and core dynamical fields.
+  and 120 hours before the first observed landfall in an episode, or before
+  closest coastal approach for episodes without landfall.
+- **Metrics:** Track, ERA5-referenced gridded wind and pressure, landfall time
+  and location for landfall events, and core dynamical fields.
 - **Fields:** Mean sea-level pressure, 10 m winds, 500 hPa geopotential height,
   and 850/200 hPa winds. Precipitation is excluded from the initial version.
 
@@ -66,6 +70,10 @@ weather-eval config check --config configs/experiments/global_landfall_2022_2024
 weather-eval catalog build \
   --config configs/experiments/global_landfall_2022_2024.yaml \
   --output-dir outputs/coastal_catalog_2022_2024
+weather-eval catalog plan \
+  --config configs/experiments/global_landfall_2022_2024.yaml \
+  --cases-file outputs/coastal_catalog_2022_2024/final_main_primary_coastal_impact_cases.csv \
+  --output outputs/coastal_catalog_2022_2024/forecast_cases.csv
 weather-eval --help
 ```
 
@@ -73,8 +81,9 @@ The `environment.yml` file records only the environment name, Python 3.12, and
 pip. Python dependency declarations remain in `pyproject.toml`, but packages
 are installed only as required by the current development task.
 
-The coastal-impact catalog builder is implemented. Model ingestion, forecast
-verification, statistical aggregation, and plotting remain scaffolded for
+The coastal-impact catalog and forecast-case planner are implemented. Model
+forecasts will be supplied separately. Forecast ingestion, verification,
+statistical aggregation, and plotting remain scaffolded for
 incremental implementation.
 
 ## Repository Layout

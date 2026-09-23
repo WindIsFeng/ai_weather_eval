@@ -20,19 +20,19 @@ CANONICAL_FIELD_VARIABLES = (
 
 
 @dataclass(frozen=True)
-class LandfallCase:
-    """One observed ocean-to-land crossing used as an evaluation event."""
+class CoastalContactCase:
+    """One observed coastal-contact episode used as an evaluation event."""
 
     case_id: str
     storm_id: str
-    landfall_index: int
+    episode_index: int
     basin: str
-    landfall_time: datetime
+    reference_event: str
+    reference_time: datetime
     latitude: float
     longitude: float
-    lifetime_vmax_kt: float
+    coastal_episode_vmax_kt: float
     landfall_vmax_kt: Optional[float] = None
-    landfall_mslp_hpa: Optional[float] = None
     qc_status: str = "pending"
 
 
@@ -49,7 +49,7 @@ class MetricRecord:
     metric: str
     value: float
     unit: str
+    reference_dataset: Optional[str] = None
     variable: Optional[str] = None
     domain: Optional[str] = None
     qc_flag: str = "ok"
-

@@ -7,6 +7,7 @@ case_selection:
   lifetime_peak_threshold_kt: 64
 forecast_sampling:
   nominal_lead_hours: [24, 48, 72, 96, 120]
+  standard_cycle_hours_utc: [0, 6, 12, 18]
+  maximum_cycle_offset_hours: 3
 verification:
   track_metrics: [position_error]
-
