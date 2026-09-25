@@ -38,6 +38,8 @@ episodes from 83 storms. Its versioned event table, forecast-case plan, and
 case-level QC audit are in [data/catalogs/](data/catalogs/README.md); source
 revision and limitations are recorded in the
 [release note](docs/coastal_catalog_release_2026-09-22.md).
+The [Weather Hub handoff](data/handoffs/README.md) provides a ready-to-run
+570-case CSV for the five model inference projects, plus a case-to-event index.
 
 ## Getting Started
 

@@ -14,3 +14,6 @@ The versioned 2022–2024 research cohort uses NOAA IBTrACS v04r01 as revised on
 Use `pd.read_csv(path, keep_default_na=False, na_values=[""])` so the North
 Atlantic basin code `NA` is retained. Forecast cases and repeated coastal
 episodes from one storm are not independent; cluster uncertainty by `storm_id`.
+
+The [Weather Hub handoff](../handoffs/README.md) converts these planned cases
+to the inference controller's CSV format while preserving event linkage.
