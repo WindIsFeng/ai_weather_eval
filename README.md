@@ -23,9 +23,9 @@ managed outside this repository.
   against fixed GSHHG coastlines with WGS84 ellipsoidal geodesics. IBTrACS
   `DIST2LAND` and `LANDFALL` are not used. GSHHG land polygons classify every
   track point as land or sea and distinguish landfall from coastal exit.
-- **Initializations:** The nearest UTC whole hour to 24, 48, 72, 96, and 120
-  hours before the first observed landfall in an episode, or before closest
-  coastal approach for episodes without landfall. Forecast outputs remain six-hourly.
+- **Initializations:** Standard six-hourly forecast cycles near 24, 48, 72, 96,
+  and 120 hours before the first observed landfall in an episode, or before
+  closest coastal approach for episodes without landfall.
 - **Metrics:** Track, ERA5-referenced gridded wind and pressure, landfall time
   and location for landfall events, and core dynamical fields.
 - **Fields:** Mean sea-level pressure, 10 m winds, 500 hPa geopotential height,
@@ -39,9 +39,7 @@ case-level QC audit are in [data/catalogs/](data/catalogs/README.md); source
 revision and limitations are recorded in the
 [release note](docs/coastal_catalog_release_2026-09-22.md).
 The [Weather Hub handoff](data/handoffs/README.md) provides a ready-to-run
-570-case hourly-initialization CSV for the five model inference projects, plus
-the revised schedule and a case-to-event index. The frozen 2026-09-22 forecast
-plan retains its original six-hour cycle selection for release reproducibility.
+570-case CSV for the five model inference projects, plus a case-to-event index.
 
 ## Getting Started
 
@@ -76,12 +74,12 @@ Install the local package in editable mode when the project CLI is needed:
 ```bash
 conda run --name ai-weather-eval python -m pip install --editable .
 export AI_WEATHER_EVAL_DATA=/path/to/ai_weather_eval_data
-weather-eval config check --config configs/experiments/global_landfall_2022_2024_hourly.yaml
+weather-eval config check --config configs/experiments/global_landfall_2022_2024.yaml
 weather-eval catalog build \
-  --config configs/experiments/global_landfall_2022_2024_hourly.yaml \
+  --config configs/experiments/global_landfall_2022_2024.yaml \
   --output-dir outputs/coastal_catalog_my_run
 weather-eval catalog plan \
-  --config configs/experiments/global_landfall_2022_2024_hourly.yaml \
+  --config configs/experiments/global_landfall_2022_2024.yaml \
   --cases-file data/catalogs/coastal_impact_events_2022_2024_v2026-09-22.csv \
   --output outputs/coastal_catalog_my_run/forecast_cases.csv
 weather-eval --help
