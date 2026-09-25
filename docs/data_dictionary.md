@@ -52,7 +52,8 @@ IBTrACS/GSHHG 为参考，网格强度和动力场以 ERA5 为参考；同名指
 起报计划。`forecast_case_id` 为 `<case_id>-L<三位小时数>`；
 `reference_event`、`reference_time` 和 `reference_latitude`/`reference_longitude`
 固定观测事件。`target_init_time` 是参考时刻减去名义提前量；`init_time` 是匹配的
-标准起报周期；`actual_lead_hours` 和 `cycle_offset_hours` 记录实际偏移。
+UTC 整点（历史冻结计划使用 6 小时周期）；`actual_lead_hours` 和
+`cycle_offset_hours` 记录实际偏移。
 `schedule_status` 标记 `matched` 或 `no_cycle_within_tolerance`。本表不代表
 模型输出已经存在，模型覆盖情况在后续导入时另行统计。
 

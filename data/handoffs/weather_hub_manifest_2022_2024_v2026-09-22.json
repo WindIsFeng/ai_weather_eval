@@ -8,35 +8,68 @@
     "graphcast",
     "aurora"
   ],
-  "rule": "forecast_hours = ceil((reference_time - init_time) / 6 hours) * 6 hours",
+  "initialization_rule": "nearest exact UTC hour to reference_time minus nominal_lead_hours; ties use earlier hour",
+  "maximum_init_offset_hours": 0.5,
+  "forecast_rule": "forecast_hours = ceil((reference_time - init_time) / 6 hours) * 6 hours",
   "output_interval_hours": 6,
   "event_count": 114,
   "case_count": 570,
-  "unique_init_time_count": 510,
+  "unique_init_time_count": 564,
+  "init_hour_counts": {
+    "00": 25,
+    "01": 15,
+    "02": 15,
+    "03": 25,
+    "04": 20,
+    "05": 15,
+    "06": 35,
+    "07": 30,
+    "08": 55,
+    "09": 25,
+    "10": 20,
+    "11": 20,
+    "12": 25,
+    "13": 20,
+    "14": 20,
+    "15": 30,
+    "16": 40,
+    "17": 25,
+    "18": 10,
+    "19": 10,
+    "20": 30,
+    "21": 30,
+    "22": 20,
+    "23": 10
+  },
   "forecast_hours_counts": {
-    "24": 55,
-    "30": 59,
-    "48": 55,
-    "54": 59,
-    "72": 55,
-    "78": 59,
-    "96": 55,
-    "102": 59,
-    "120": 55,
-    "126": 59
+    "24": 62,
+    "30": 52,
+    "48": 62,
+    "54": 52,
+    "72": 62,
+    "78": 52,
+    "96": 62,
+    "102": 52,
+    "120": 62,
+    "126": 52
   },
   "sources": {
     "data/catalogs/coastal_impact_events_2022_2024_v2026-09-22.csv": "6deeac85ab0980935b98389612d4da73411a333d3863365aa899b6ef5bd9d876",
-    "data/catalogs/coastal_impact_forecast_cases_2022_2024_v2026-09-22.csv": "5caafbd202bf85560e1a4ebe96834a67aefd52d734a1cb612a7fe62b1a993443"
+    "data/catalogs/coastal_impact_forecast_cases_2022_2024_v2026-09-22.csv": "5caafbd202bf85560e1a4ebe96834a67aefd52d734a1cb612a7fe62b1a993443",
+    "configs/experiments/global_landfall_2022_2024_hourly.yaml": "36d7cf9a32ec72d394563c9b7cc0f5aeea4a05a637edef303d774f3c0f8134fb"
   },
   "artifacts": {
+    "weather_hub_hourly_schedule_2022_2024_v2026-09-22.csv": {
+      "rows": 570,
+      "sha256": "4be5cb3f9821b14d574f7483bd7d4c97d2d1384759d45594ba68326e2baa2755"
+    },
     "weather_hub_cases_2022_2024_v2026-09-22.csv": {
       "rows": 570,
-      "sha256": "0813a056a1971fe7c28efaec6214ad19546acd5246bea3737776bd909d683cd9"
+      "sha256": "ce17f89d33b9c5c26bc8ebb2c4b570651b6767e67286594393a325d2bcced124"
     },
     "weather_hub_case_index_2022_2024_v2026-09-22.csv": {
       "rows": 570,
-      "sha256": "aad0294c80214a594b44d5c676cd35ab6527f5ec075e5b7ca76eb043d95a88c4"
+      "sha256": "af4c18912b9333dd8d474f412c3ba14d9c4d91d333bca6abcb65931c109c9bd8"
     }
   }
 }

@@ -222,6 +222,8 @@ def audit(catalog_dir: Path) -> dict[str, object]:
             failures.append("invalid_reference_event")
 
         expected_leads = set(experiment["forecast_sampling"]["nominal_lead_hours"])
+        allowed_hours = set(experiment["forecast_sampling"]["standard_cycle_hours_utc"])
+        max_offset = experiment["forecast_sampling"]["maximum_cycle_offset_hours"]
         if set(schedule["nominal_lead_hours"]) != expected_leads or len(schedule) != len(
             expected_leads
         ):
@@ -238,14 +240,14 @@ def audit(catalog_dir: Path) -> dict[str, object]:
             if recorded_target != target:
                 failures.append("forecast_target_time_mismatch")
                 break
-            if plan.init_time.hour not in {0, 6, 12, 18} or plan.init_time.minute != 0:
+            if plan.init_time.hour not in allowed_hours or plan.init_time.minute != 0:
                 failures.append("forecast_nonstandard_cycle")
                 break
             actual = (case.reference_time - plan.init_time).total_seconds() / 3600
             if not np.isclose(actual, plan.actual_lead_hours, atol=1e-6):
                 failures.append("forecast_actual_lead_mismatch")
                 break
-            if abs(actual - plan.nominal_lead_hours) > 3 + 1e-6:
+            if abs(actual - plan.nominal_lead_hours) > max_offset + 1e-6:
                 failures.append("forecast_cycle_offset_exceeded")
                 break
             if not np.isclose(
