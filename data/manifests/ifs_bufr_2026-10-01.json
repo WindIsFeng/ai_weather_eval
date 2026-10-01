@@ -1,16 +1,16 @@
 {
   "dataset": "User-uploaded ECMF deterministic tropical-cyclone BUFR, 2021–2025",
-  "organized_at_utc": "2026-10-01T05:45:14.174176+00:00",
+  "organized_at_utc": "2026-10-01T06:16:22.582016+00:00",
   "archive": {
-    "path": "data/EC_BUFR_data_and_extraction/archive/ECMF_BUFR_2021-2025.tar.gz",
+    "path": "data/raw/baselines/ifs/ECMF_BUFR_2021-2025.tar.gz",
     "sha256": "a38e58f2af08ec14b41466b84cd1f7eaeff6eae2b8ba14054bbab8f87c6cf163"
   },
   "original_extractor": {
-    "path": "data/EC_BUFR_data_and_extraction/reference/extract_original.py",
+    "path": "data/frozen_sources/ifs_bufr/extract_original.py",
     "sha256": "d1ec059733b40a9eee90dbb6cb78444c09de8fe867dcc14aa09f86c7efd2e977"
   },
   "decoder": "ecCodes; actual encoded periods only; HRES member 52",
-  "raw_inventory": "data/EC_BUFR_data_and_extraction/extracted/file_inventory.csv",
+  "raw_inventory": "data/interim/ifs_bufr/file_inventory.csv",
   "qc": {
     "archive_sha256": "a38e58f2af08ec14b41466b84cd1f7eaeff6eae2b8ba14054bbab8f87c6cf163",
     "files": 7448,
@@ -59,38 +59,38 @@
   "artifacts": {
     "storm_links": {
       "rows": 7448,
-      "path": "data/EC_BUFR_data_and_extraction/extracted/storm_links.csv",
-      "sha256": "f40325f6a695541c28934ca96ea629ddbc9f511356da610c7f97f761f3cead03"
+      "path": "data/interim/ifs_bufr/storm_links.csv",
+      "sha256": "3adf47e70b3acf9ccd7bb1825b459a8d82589eb80ce0ae019255deb3fbce9cbb"
     },
     "event_overlap": {
       "rows": 114,
-      "path": "data/EC_BUFR_data_and_extraction/extracted/event_overlap.csv",
+      "path": "data/catalogs/ifs_event_overlap_2026-10-01.csv",
       "sha256": "5731701b5648784fbbc10a4ed5e11b31f5bd63e105e8f289d4a79f70931e7755"
     },
     "case_overlap": {
       "rows": 570,
-      "path": "data/EC_BUFR_data_and_extraction/extracted/case_overlap.csv",
-      "sha256": "d4af9804e205f5a83792e3fef473ad52d7a01597471c44da51202023fd0421ff"
+      "path": "data/catalogs/ifs_case_overlap_2026-10-01.csv",
+      "sha256": "fc50e785cfaab84e17097b83159e422a308278047714271dd219b32b700b25e3"
     },
     "coverage_by_year": {
       "rows": 3,
-      "path": "data/EC_BUFR_data_and_extraction/extracted/coverage_by_year.csv",
+      "path": "data/catalogs/ifs_coverage_by_year_2026-10-01.csv",
       "sha256": "c2dddbe2d84b715349eff5b501bf1996d63ec6d407dc173d259c7019d39041d2"
     },
     "coverage_by_lead": {
       "rows": 5,
-      "path": "data/EC_BUFR_data_and_extraction/extracted/coverage_by_lead.csv",
+      "path": "data/catalogs/ifs_coverage_by_lead_2026-10-01.csv",
       "sha256": "18c191f234ebf0dd6305de4d5709df79c6f809f2d72be54ca0eee8569d932868"
     },
     "cohort_tracks": {
       "rows": 36588,
-      "path": "data/EC_BUFR_data_and_extraction/extracted/cohort_tracks.csv.gz",
-      "sha256": "201233a5c38bef9508795a88adb7cf931dd08df8262ded1a2ce3043c54fd6c0b"
+      "path": "data/interim/ifs_bufr/cohort_tracks.csv.gz",
+      "sha256": "141a537915a1d6dbd717b97e4debe36c7bcfeaac6bda583216fbea91efba79ed"
     },
     "matched_case_endpoints": {
       "rows": 561,
-      "path": "data/EC_BUFR_data_and_extraction/extracted/matched_case_endpoints.csv.gz",
-      "sha256": "39807acd71b1e43bbe0dc75ebcc4a061bb2701304ffc0ee749c4fea1f8ed5328"
+      "path": "data/interim/ifs_bufr/matched_case_endpoints.csv.gz",
+      "sha256": "0cd920c6e7f7334c5bffee3e62671679c5fce619f04a1d903368f6e01be23223"
     }
   }
 }

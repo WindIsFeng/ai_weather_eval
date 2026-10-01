@@ -8,8 +8,8 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import os
 import re
-import shutil
 import sys
 import tarfile
 from datetime import datetime, timezone
@@ -23,6 +23,9 @@ from ai_weather_eval.preprocessing.ifs_bufr import decode_message, split_bufr_me
 ARCHIVE = "ECMF_BUFR_2021-2025.tar.gz"
 FROZEN = "2022_2024_v2026-09-22"
 STAMP = "2026-10-01"
+RAW = Path("raw/baselines/ifs")
+INTERIM = Path("interim/ifs_bufr")
+REFERENCE = Path("data/frozen_sources/ifs_bufr")
 
 
 def sha256(path: Path) -> str:
@@ -30,32 +33,10 @@ def sha256(path: Path) -> str:
         return hashlib.file_digest(stream, "sha256").hexdigest()
 
 
-def organize(root: Path) -> Path:
-    """Remove the redundant wrapper without altering uploaded file content."""
-    (root / "archive").mkdir(parents=True, exist_ok=True)
-    (root / "reference").mkdir(exist_ok=True)
-    old = root / "EC_BUFR_data_and_extraction"
-    for filename, destination in (
-        (ARCHIVE, root / "archive" / ARCHIVE),
-        ("extract.py", root / "reference" / "extract_original.py"),
-        ("README.txt", root / "reference" / "README_original.txt"),
-    ):
-        source = old / filename
-        if source.exists():
-            if destination.exists():
-                if sha256(source) != sha256(destination):
-                    raise ValueError(f"Refusing to overwrite different file: {destination}")
-            else:
-                shutil.move(source, destination)
-    if old.exists() and not any(old.iterdir()):
-        old.rmdir()
-    return root / "archive" / ARCHIVE
-
-
 def extract(root: Path):
-    archive = organize(root)
-    output = root / "extracted"
-    output.mkdir(exist_ok=True)
+    archive = root / RAW / ARCHIVE
+    output = root / INTERIM
+    output.mkdir(parents=True, exist_ok=True)
     inventory, messages, tracks, failures = [], [], [], []
     with tarfile.open(archive, "r:gz") as bundle:
         for member in sorted(bundle.getmembers(), key=lambda item: item.name):
@@ -69,7 +50,7 @@ def extract(root: Path):
                 raise ValueError(f"Unexpected archive member: {member.name}")
             with bundle.extractfile(member) as stream:
                 data = stream.read()
-            raw_relative = Path("raw") / relative.parts[1] / relative.parts[2]
+            raw_relative = RAW / relative.parts[1] / relative.parts[2]
             destination = root / raw_relative
             destination.parent.mkdir(parents=True, exist_ok=True)
             digest = hashlib.sha256(data).hexdigest()
@@ -147,20 +128,21 @@ def extract(root: Path):
 
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--data-root", type=Path, default=Path("data/EC_BUFR_data_and_extraction"))
+    parser.add_argument("--data-root", type=Path,
+                        default=Path(os.environ.get("AI_WEATHER_EVAL_DATA", "data")),
+                        help="Shared data root containing raw/ and interim/")
     parser.add_argument("--extract-only", action="store_true")
     parser.add_argument("--match-only", action="store_true",
                         help="Reuse a completed local extraction and rerun cohort matching")
-    parser.add_argument("--truth", type=Path,
-                        default=Path("data/raw/ibtracs/ibtracs.since1980.2026-09-22.study_range.csv"))
+    parser.add_argument("--truth", type=Path, help="Override the frozen IBTrACS source")
     args = parser.parse_args()
     if args.extract_only and args.match_only:
         parser.error("--extract-only and --match-only are mutually exclusive")
     if args.match_only:
-        output = args.data_root / "extracted"
+        output = args.data_root / INTERIM
         qc = json.loads((output / "qc_summary.json").read_text())
         if qc["decode_failures"] or qc["archive_sha256"] != sha256(
-            args.data_root / "archive" / ARCHIVE
+            args.data_root / RAW / ARCHIVE
         ):
             raise ValueError("Existing extraction failed or belongs to another archive")
         options = {"keep_default_na": False, "na_values": [""]}
@@ -179,8 +161,10 @@ def main() -> int:
         return 0
     from ai_weather_eval.preprocessing.ifs_matching import match_ifs_to_cohort
 
-    truth_path = args.truth
-    if not truth_path.exists():
+    truth_path = args.truth or (
+        args.data_root / "raw/ibtracs/ibtracs.since1980.2026-09-22.study_range.csv"
+    )
+    if args.truth is None and not truth_path.exists():
         truth_path = Path("data/frozen_sources/ibtracs.since1980.2026-09-22.study_range.csv.gz")
     truth = pd.read_csv(truth_path, skiprows=[1], dtype=str, keep_default_na=False,
                         skipinitialspace=True, low_memory=False)
@@ -190,11 +174,13 @@ def main() -> int:
     events = pd.read_csv(events_path, **read_options)
     cases = pd.read_csv(cases_path, **read_options)
     results = match_ifs_to_cohort(messages, tracks, truth, events, cases)
-    output = args.data_root / "extracted"
+    output = args.data_root / INTERIM
+    artifacts = {}
     for name, frame in results.items():
-        frame.to_csv(output / f"{name}.csv", index=False)
-        if name != "storm_links":
-            frame.to_csv(Path("data/catalogs") / f"ifs_{name}_{STAMP}.csv", index=False)
+        path = (output / "storm_links.csv" if name == "storm_links"
+                else Path("data/catalogs") / f"ifs_{name}_{STAMP}.csv")
+        frame.to_csv(path, index=False)
+        artifacts[name] = {"rows": len(frame), "path": path.as_posix(), "sha256": sha256(path)}
     links = results["storm_links"]
     cohort_links = links.loc[
         links["identity_status"].eq("matched_cohort") & links["usable_forecast"]
@@ -224,10 +210,10 @@ def main() -> int:
     manifest = {
         "dataset": "User-uploaded ECMF deterministic tropical-cyclone BUFR, 2021–2025",
         "organized_at_utc": datetime.now(timezone.utc).isoformat(),
-        "archive": {"path": (args.data_root / "archive" / ARCHIVE).as_posix(),
+        "archive": {"path": (args.data_root / RAW / ARCHIVE).as_posix(),
                     "sha256": qc["archive_sha256"]},
-        "original_extractor": {"path": (args.data_root / "reference/extract_original.py").as_posix(),
-                               "sha256": sha256(args.data_root / "reference/extract_original.py")},
+        "original_extractor": {"path": (REFERENCE / "extract_original.py").as_posix(),
+                               "sha256": sha256(REFERENCE / "extract_original.py")},
         "decoder": "ecCodes; actual encoded periods only; HRES member 52",
         "raw_inventory": (output / "file_inventory.csv").as_posix(),
         "qc": qc,
@@ -237,10 +223,7 @@ def main() -> int:
         "matching": {"identity": "Same-time observed position within 150 km; 75 km ambiguity gap",
                      "planned_cases": "Exact SID plus frozen init_time; no cycle substitution",
                      "reference_coverage": "Exact position or bracketing positions at most 6 h apart"},
-        "artifacts": {name: {"rows": len(frame),
-                     "path": (output / f"{name}.csv").as_posix(),
-                     "sha256": sha256(output / f"{name}.csv")}
-                      for name, frame in results.items()},
+        "artifacts": artifacts,
     }
     for name, frame in (("cohort_tracks", cohort_tracks), ("matched_case_endpoints", case_endpoints)):
         path = output / f"{name}.csv.gz"

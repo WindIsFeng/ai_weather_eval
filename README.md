@@ -7,8 +7,8 @@ IBTrACS `USA_WIND` of at least 64 kt within the coastal-contact episode or six
 hours on either side; this one-minute-wind threshold defines the study's
 "severe tropical cyclone" sample.
 
-This repository contains case management, model-output adapters, verification,
-statistical analysis, and plotting code. Model inference and large datasets are
+This repository contains coastal-case selection and QC, forecast-case planning,
+model-output adapters, and IFS/WeatherNext track processing. Model inference is
 managed outside this repository.
 
 ## Research Scope
@@ -46,6 +46,7 @@ The uploaded 2021–2025 IFS BUFR tracks are organized and decoded through
 has 284 usable planned IFS cases from 99 events; the matching definitions and
 coverage audit are in the
 [IFS overlap summary](reports/ifs_bufr_cohort_overlap_2026-10-01.md).
+See [docs/ifs_bufr.md](docs/ifs_bufr.md) for reconstruction and the shared data layout.
 
 ## Getting Started
 
@@ -80,35 +81,40 @@ Install the local package in editable mode when the project CLI is needed:
 ```bash
 conda run --name ai-weather-eval python -m pip install --editable .
 export AI_WEATHER_EVAL_DATA=/path/to/ai_weather_eval_data
-weather-eval config check --config configs/experiments/global_landfall_2022_2024.yaml
-weather-eval catalog build \
+conda run --name ai-weather-eval weather-eval config check \
+  --config configs/experiments/global_landfall_2022_2024.yaml
+conda run --name ai-weather-eval weather-eval catalog build \
   --config configs/experiments/global_landfall_2022_2024.yaml \
   --output-dir outputs/coastal_catalog_my_run
-weather-eval catalog plan \
+conda run --name ai-weather-eval weather-eval catalog plan \
   --config configs/experiments/global_landfall_2022_2024.yaml \
   --cases-file data/catalogs/coastal_impact_events_2022_2024_v2026-09-22.csv \
   --output outputs/coastal_catalog_my_run/forecast_cases.csv
-weather-eval --help
+conda run --name ai-weather-eval weather-eval --help
 ```
 
 The `environment.yml` file records only the environment name, Python 3.12, and
 pip. Python dependency declarations remain in `pyproject.toml`, but packages
 are installed only as required by the current development task.
 
-The coastal-impact catalog and forecast-case planner are implemented. Model
-forecasts will be supplied separately. Forecast ingestion, verification,
-statistical aggregation, and plotting remain scaffolded for
-incremental implementation.
+The CLI supports configuration checks, coastal-catalog construction, and
+forecast-case planning. IFS extraction, WeatherNext evaluation, catalog QC,
+and the Weather Hub handoff use the scripts in `scripts/`. General gridded
+forecast ingestion, verification, and model comparison remain future work.
 
 ## Repository Layout
 
 - `configs/`: Dataset, model, experiment, and figure configuration.
-- `data/`: Data documentation, manifests, versioned small research catalogs, a compressed frozen source extract, and test samples.
-- `src/ai_weather_eval/`: Tested production code.
+- `data/`: Shared `raw/` and `interim/` stores, frozen sources, manifests,
+  final catalogs, inference handoffs, and compact test samples.
+- `src/ai_weather_eval/`: Implemented catalog, adapter, metric, and preprocessing code.
+- `scripts/`: Download, reconstruction, QC, handoff, and evaluation entry points.
+- `docs/`: Methodology, data definitions, and dataset-specific instructions.
 - `tests/`: Unit tests, integration tests, and compact fixtures.
 - `notebooks/`: Exploration, manual quality control, and artifact review; core
   workflow logic does not belong here.
-- `outputs/`: Generated run artifacts excluded from Git.
+- `outputs/`: Current generated results excluded from Git; remove superseded runs
+  after confirming the final version.
 - `reports/`: Reviewed publication figures and tables that may be versioned.
 
 ## External Data

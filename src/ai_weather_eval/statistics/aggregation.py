@@ -1,2 +1,0 @@
-"""Tidy metric aggregation placeholder."""
-

@@ -15,3 +15,8 @@ SHA-256, and run `conda run --name ai-weather-eval python
 scripts/restore_frozen_coastal_sources.py --data-root data` from the repository
 root. The script restores this compressed IBTrACS extract and the four GSHHG
 intermediate-resolution level-1 shapefile components.
+
+`ifs_bufr/` preserves the uploaded ECMWF reference extractor and its original
+instructions, including copyright and licence notices. These files document
+the source; the maintained entry point is `scripts/extract_ifs_bufr.py`.
+The IFS archive and BUFR inputs live in `data/raw/baselines/ifs/`.

@@ -1,16 +1,8 @@
 # Runtime outputs
 
-`outputs/<experiment>/<run_id>/` 由工作流生成，建议包含：
+本目录保存当前生成结果，除本说明外不纳入 Git。现有最终 WN-C 评估在
+`wnc_2023_2024/`，包含逐案例结果、逐年逐时效汇总、总览和下载清单。
 
-```text
-resolved_config.yaml
-manifest.json
-logs/
-qc/
-metrics/
-tables/
-figures/
-```
-
-除本说明外，本目录被 Git 忽略。`run_id` 应由 UTC 时间和配置摘要组成，避免覆盖历史结果。
+试验运行可使用独立目录。确认最终版本并核对来源及校验和后，清理重复和过时运行。
+正式小型研究目录只保存在 `data/catalogs/`；报告和发表图件放在 `reports/`。
 

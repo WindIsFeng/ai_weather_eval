@@ -2,33 +2,31 @@
 
 用户于 2026-10-01 上传的 `ECMF_BUFR_2021-2025.tar.gz`，包含 2021–2025 年
 7,448 个 ECMWF 确定性热带气旋轨迹文件。上传包没有说明获取渠道或连续归档的
-完整性，因此本目录仅描述实际提供的文件，不代表 ECMWF 完整历史预报库。
+完整性，因此本说明仅描述实际提供的文件，不代表 ECMWF 完整历史预报库。
 
-## 整理后的目录
+## 目录与保留文件
 
 ```text
-EC_BUFR_data_and_extraction/
-├── archive/ECMF_BUFR_2021-2025.tar.gz  # 原始压缩包，内容保持不变
-├── reference/
-│   ├── extract_original.py           # 原上传脚本，保留 ECMWF 版权和许可
-│   └── README_original.txt
-├── raw/2021/ … raw/2025/             # 按年份解包的不可变原始 BUFR
-└── extracted/
-    ├── file_inventory.csv            # 文件路径、大小、SHA-256、解码状态
-    ├── messages.csv.gz               # 每文件/消息的初始化、风暴和有效预报元数据
-    ├── tracks_2021.csv.gz … tracks_2025.csv.gz
-    ├── cohort_tracks.csv.gz           # 关联 SID 的入选风暴完整轨迹
-    ├── matched_case_endpoints.csv.gz  # 原计划可用案例的精确点/插值端点
-    ├── qc_summary.json
-    ├── storm_links.csv               # 全部消息的 IBTrACS SID 身份审计
-    ├── event_overlap.csv             # 保留原 114 个事件
-    ├── case_overlap.csv              # 保留原 570 个预报案例及不可用原因
-    ├── coverage_by_year.csv
-    └── coverage_by_lead.csv
+data/
+├── raw/baselines/ifs/
+│   ├── ECMF_BUFR_2021-2025.tar.gz      # 原始压缩包，内容保持不变
+│   └── 2021/ … 2025/                 # 不可变原始 BUFR
+├── interim/ifs_bufr/
+│   ├── file_inventory.csv            # 路径、大小、SHA-256、解码状态
+│   ├── messages.csv.gz               # 初始化、风暴和有效预报元数据
+│   ├── tracks_2021.csv.gz … tracks_2025.csv.gz
+│   ├── cohort_tracks.csv.gz           # 关联 SID 的入选风暴完整轨迹
+│   ├── matched_case_endpoints.csv.gz  # 原计划可用案例的精确点/插值端点
+│   ├── qc_summary.json
+│   └── storm_links.csv               # 全部消息的 IBTrACS SID 身份审计
+├── catalogs/ifs_*_2026-10-01.csv       # 唯一正式事件/案例重合及年/时效汇总
+└── frozen_sources/ifs_bufr/
+    ├── extract_original.py            # 仅作来源参考，保留 ECMWF 版权和许可
+    └── README_original.txt
 ```
 
-原始归档、解包文件及完整派生表不纳入 Git。小型重合表的版本化副本保存在
-`data/catalogs/ifs_*_2026-10-01.csv`，来源校验和保存在
+原始归档、解包文件及完整派生表不纳入 Git。正式重合表只保存在
+`data/catalogs/ifs_*_2026-10-01.csv`，不在 `interim/` 重复保存。来源校验和保存在
 `data/manifests/ifs_bufr_2026-10-01.json`；结果说明见
 `reports/ifs_bufr_cohort_overlap_2026-10-01.md`。
 
@@ -39,17 +37,18 @@ EC_BUFR_data_and_extraction/
 
 ```bash
 conda run --name ai-weather-eval python -m pip install eccodes
-conda run --name ai-weather-eval python scripts/extract_ifs_bufr.py
-```
-
-已完成提取后，可以重跑匹配：
-
-```bash
+conda run --name ai-weather-eval python scripts/extract_ifs_bufr.py --extract-only
 conda run --name ai-weather-eval python scripts/extract_ifs_bufr.py --match-only
 ```
 
+已完成提取后，只需第二条命令重跑匹配。两步均已完成全量验证；当前环境中合并
+运行曾在产物写出后的进程退出阶段出现 `free(): invalid size`，因此推荐分步执行。
+
 `--extract-only` 只整理和解码。重复运行不会覆盖内容不同的原始文件；遇到不认识的
 BUFR 结构会记录错误并终止，不默默丢弃。
+`--data-root` 或 `AI_WEATHER_EVAL_DATA` 指定共享数据根目录；默认使用 `data/`。
+正式重合表和清单仍写入仓库的 `data/catalogs/` 和 `data/manifests/`。
+各表的 `source_file` 相对于共享数据根目录，路径为 `raw/baselines/ifs/<year>/…`。
 
 ## 字段与判定
 

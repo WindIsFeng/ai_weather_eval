@@ -27,12 +27,6 @@ from ai_weather_eval.config import ConfigError, load_yaml, validate_experiment
 from ai_weather_eval.preprocessing.forecast_matching import build_forecast_case_schedule
 
 
-def _add_workflow_command(subparsers: argparse._SubParsersAction, name: str, help_text: str) -> None:
-    parser = subparsers.add_parser(name, help=help_text)
-    parser.add_argument("--config", type=Path, required=True, help="Experiment YAML file")
-    parser.set_defaults(handler=_pending_workflow)
-
-
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(prog="weather-eval", description=__doc__)
     parser.add_argument("--version", action="version", version=__version__)
@@ -65,11 +59,6 @@ def build_parser() -> argparse.ArgumentParser:
     catalog_plan.add_argument("--output", type=Path, required=True)
     catalog_plan.set_defaults(handler=_plan_forecast_cases)
 
-    _add_workflow_command(subparsers, "ingest", "Normalize model forecast files")
-    _add_workflow_command(subparsers, "verify", "Compute case-level verification metrics")
-    _add_workflow_command(subparsers, "summarize", "Aggregate metrics and uncertainty")
-    _add_workflow_command(subparsers, "plot", "Generate configured figures")
-    _add_workflow_command(subparsers, "run", "Run the complete evaluation pipeline")
     return parser
 
 
@@ -79,16 +68,6 @@ def _check_config(args: argparse.Namespace) -> int:
     print(f"Configuration is valid: {args.config}")
     if args.show:
         print(json.dumps(config, indent=2, ensure_ascii=False, default=str))
-    return 0
-
-
-def _pending_workflow(args: argparse.Namespace) -> int:
-    config = load_yaml(args.config)
-    validate_experiment(config)
-    print(
-        f"Workflow '{args.command}' is scaffolded but not implemented yet. "
-        "The experiment configuration was validated successfully."
-    )
     return 0
 
 

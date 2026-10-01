@@ -8,8 +8,9 @@
 
 ## 数据整理和提取
 
-冗余的同名上传目录已展开为 `archive/`、`reference/`、`raw/<year>/` 和
-`extracted/`。保留原压缩包、原提取脚本和原说明文件；全部原始文件逐一记录
+原压缩包及按年份解包的 BUFR 统一放在 `data/raw/baselines/ifs/`，派生轨迹
+放在 `data/interim/ifs_bufr/`，正式重合表只保留 `data/catalogs/` 的一份。
+原参考脚本和说明在 `data/frozen_sources/ifs_bufr/`；全部原始文件逐一记录
 SHA-256。包中 7,448 个文件均正常解码，无字节重复或解码失败：
 
 | 起报年份 | 原始文件数 |
@@ -94,13 +95,13 @@ ROSLYN 是唯一没有确认有效 IFS 预报的入选风暴。其他三个事�
 
 ## 文件和验证
 
-- 全年份轨迹：`data/EC_BUFR_data_and_extraction/extracted/tracks_*.csv.gz`。
+- 全年份轨迹：`data/interim/ifs_bufr/tracks_*.csv.gz`。
 - 入选风暴轨迹及 SID：同目录 `cohort_tracks.csv.gz`。
 - 284 个原计划案例的实际支持点：同目录 `matched_case_endpoints.csv.gz`。
 - 逐事件/逐案例重合明细：`data/catalogs/ifs_event_overlap_2026-10-01.csv` 和
   `data/catalogs/ifs_case_overlap_2026-10-01.csv`。
 - 来源、冻结队列及产物校验和：`data/manifests/ifs_bufr_2026-10-01.json`。
-- 重建说明：`data/EC_BUFR_data_and_extraction/README.md`。
+- 重建说明：[../docs/ifs_bufr.md](../docs/ifs_bufr.md)。
 
 所有命令使用既有 `ai-weather-eval` Conda 环境，仅新增本任务需要的 ecCodes。
 项目测试共 65 项通过，覆盖真实小型 BUFR、缺失值和单位、观测与模型位置
