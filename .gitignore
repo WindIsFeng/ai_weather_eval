@@ -43,3 +43,8 @@ data/cache/
 # Figures
 *.png
 *.tif
+
+# User-uploaded IFS archive, immutable decoded inputs and reproducible full tables
+data/EC_BUFR_data_and_extraction/archive/
+data/EC_BUFR_data_and_extraction/raw/
+data/EC_BUFR_data_and_extraction/extracted/

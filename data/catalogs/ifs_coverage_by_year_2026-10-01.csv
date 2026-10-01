@@ -1,0 +1,4 @@
+year,total_events,total_storms,storms_with_forecast,events_with_storm_forecast,events_with_reference_coverage,events_with_any_available_case,events_with_all_planned_cases,total_cases,strict_init_present_cases,available_cases,wind_available_cases,pressure_available_cases,available_case_fraction
+2022,35,25,24,34,34,33,5,175,106,93,93,93,0.5314285714285715
+2023,38,29,29,38,37,35,6,190,128,105,105,105,0.5526315789473685
+2024,41,29,29,41,39,31,4,205,106,86,86,86,0.4195121951219512

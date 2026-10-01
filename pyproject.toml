@@ -24,6 +24,9 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
+bufr = [
+  "eccodes>=2.16",
+]
 geo = [
   "geopandas>=0.14",
   "xesmf>=0.8",

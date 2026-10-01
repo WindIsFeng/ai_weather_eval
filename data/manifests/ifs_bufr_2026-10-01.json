@@ -1,0 +1,96 @@
+{
+  "dataset": "User-uploaded ECMF deterministic tropical-cyclone BUFR, 2021–2025",
+  "organized_at_utc": "2026-10-01T05:45:14.174176+00:00",
+  "archive": {
+    "path": "data/EC_BUFR_data_and_extraction/archive/ECMF_BUFR_2021-2025.tar.gz",
+    "sha256": "a38e58f2af08ec14b41466b84cd1f7eaeff6eae2b8ba14054bbab8f87c6cf163"
+  },
+  "original_extractor": {
+    "path": "data/EC_BUFR_data_and_extraction/reference/extract_original.py",
+    "sha256": "d1ec059733b40a9eee90dbb6cb78444c09de8fe867dcc14aa09f86c7efd2e977"
+  },
+  "decoder": "ecCodes; actual encoded periods only; HRES member 52",
+  "raw_inventory": "data/EC_BUFR_data_and_extraction/extracted/file_inventory.csv",
+  "qc": {
+    "archive_sha256": "a38e58f2af08ec14b41466b84cd1f7eaeff6eae2b8ba14054bbab8f87c6cf163",
+    "files": 7448,
+    "decoded_messages": 7448,
+    "decode_failures": [],
+    "encoded_track_rows": 110744,
+    "files_by_year": {
+      "2021": 1607,
+      "2022": 1565,
+      "2023": 1897,
+      "2024": 1676,
+      "2025": 703
+    },
+    "duplicate_file_hashes": 0,
+    "positive_forecast_messages": 6317,
+    "no_positive_forecast_messages": 1131,
+    "members": [
+      52
+    ],
+    "max_encoded_lead_hours": 240,
+    "valid_positive_track_rows": 99543,
+    "missing_position_rows": 4946,
+    "missing_pressure_rows": 4946,
+    "missing_wind_rows": 4946,
+    "duplicate_track_keys": 0,
+    "positive_forecast_messages_by_utc_hour": {
+      "0": 1651,
+      "6": 1538,
+      "12": 1614,
+      "18": 1514
+    }
+  },
+  "cohort": {
+    "events_path": "data/catalogs/coastal_impact_events_2022_2024_v2026-09-22.csv",
+    "events_sha256": "6deeac85ab0980935b98389612d4da73411a333d3863365aa899b6ef5bd9d876",
+    "cases_path": "data/catalogs/coastal_impact_forecast_cases_2022_2024_v2026-09-22.csv",
+    "cases_sha256": "5caafbd202bf85560e1a4ebe96834a67aefd52d734a1cb612a7fe62b1a993443",
+    "truth_path": "data/raw/ibtracs/ibtracs.since1980.2026-09-22.study_range.csv",
+    "truth_sha256": "290b57e7d353b5a7db6bab9ea818144f4cb835c58e17a7d4a5bd7ca0fe65d028"
+  },
+  "matching": {
+    "identity": "Same-time observed position within 150 km; 75 km ambiguity gap",
+    "planned_cases": "Exact SID plus frozen init_time; no cycle substitution",
+    "reference_coverage": "Exact position or bracketing positions at most 6 h apart"
+  },
+  "artifacts": {
+    "storm_links": {
+      "rows": 7448,
+      "path": "data/EC_BUFR_data_and_extraction/extracted/storm_links.csv",
+      "sha256": "f40325f6a695541c28934ca96ea629ddbc9f511356da610c7f97f761f3cead03"
+    },
+    "event_overlap": {
+      "rows": 114,
+      "path": "data/EC_BUFR_data_and_extraction/extracted/event_overlap.csv",
+      "sha256": "5731701b5648784fbbc10a4ed5e11b31f5bd63e105e8f289d4a79f70931e7755"
+    },
+    "case_overlap": {
+      "rows": 570,
+      "path": "data/EC_BUFR_data_and_extraction/extracted/case_overlap.csv",
+      "sha256": "d4af9804e205f5a83792e3fef473ad52d7a01597471c44da51202023fd0421ff"
+    },
+    "coverage_by_year": {
+      "rows": 3,
+      "path": "data/EC_BUFR_data_and_extraction/extracted/coverage_by_year.csv",
+      "sha256": "c2dddbe2d84b715349eff5b501bf1996d63ec6d407dc173d259c7019d39041d2"
+    },
+    "coverage_by_lead": {
+      "rows": 5,
+      "path": "data/EC_BUFR_data_and_extraction/extracted/coverage_by_lead.csv",
+      "sha256": "18c191f234ebf0dd6305de4d5709df79c6f809f2d72be54ca0eee8569d932868"
+    },
+    "cohort_tracks": {
+      "rows": 36588,
+      "path": "data/EC_BUFR_data_and_extraction/extracted/cohort_tracks.csv.gz",
+      "sha256": "201233a5c38bef9508795a88adb7cf931dd08df8262ded1a2ce3043c54fd6c0b"
+    },
+    "matched_case_endpoints": {
+      "rows": 561,
+      "path": "data/EC_BUFR_data_and_extraction/extracted/matched_case_endpoints.csv.gz",
+      "sha256": "39807acd71b1e43bbe0dc75ebcc4a061bb2701304ffc0ee749c4fea1f8ed5328"
+    }
+  }
+}

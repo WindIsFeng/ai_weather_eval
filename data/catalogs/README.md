@@ -17,3 +17,11 @@ episodes from one storm are not independent; cluster uncertainty by `storm_id`.
 
 The [Weather Hub handoff](../handoffs/README.md) converts these planned cases
 to the inference controller's CSV format while preserving event linkage.
+
+The `ifs_*_2026-10-01.csv` tables audit the uploaded deterministic IFS BUFR
+coverage without changing this cohort. `ifs_event_overlap` retains all 114
+events and `ifs_case_overlap` all 570 planned cases, including unavailable
+rows. `forecast_available` requires the exact planned initialization and an
+actual position at the reference time or a valid bracket no wider than six
+hours. See the [IFS summary](../../reports/ifs_bufr_cohort_overlap_2026-10-01.md)
+and [source manifest](../manifests/ifs_bufr_2026-10-01.json).

@@ -41,6 +41,12 @@ revision and limitations are recorded in the
 The [Weather Hub handoff](data/handoffs/README.md) provides a ready-to-run
 570-case CSV for the five model inference projects, plus a case-to-event index.
 
+The uploaded 2021–2025 IFS BUFR tracks are organized and decoded through
+[`scripts/extract_ifs_bufr.py`](scripts/extract_ifs_bufr.py). The frozen cohort
+has 284 usable planned IFS cases from 99 events; the matching definitions and
+coverage audit are in the
+[IFS overlap summary](reports/ifs_bufr_cohort_overlap_2026-10-01.md).
+
 ## Getting Started
 
 All project work must use the existing `ai-weather-eval` Conda environment,

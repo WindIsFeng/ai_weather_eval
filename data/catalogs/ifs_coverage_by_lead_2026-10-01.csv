@@ -1,0 +1,6 @@
+nominal_lead_hours,available_events,available_storms,total_cases,strict_init_present_cases,available_cases,wind_available_cases,pressure_available_cases,available_case_fraction
+24,97,73,114,100,97,97,97,0.8508771929824561
+48,87,65,114,89,87,87,87,0.7631578947368421
+72,65,48,114,67,65,65,65,0.5701754385964912
+96,19,15,114,51,19,19,19,0.16666666666666666
+120,16,14,114,33,16,16,16,0.14035087719298245
