@@ -5,9 +5,9 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+from collections.abc import Sequence
 from datetime import UTC, datetime
 from pathlib import Path
-from typing import Sequence
 
 import pandas as pd
 import yaml
@@ -58,6 +58,29 @@ def build_parser() -> argparse.ArgumentParser:
     catalog_plan.add_argument("--cases-file", type=Path, required=True)
     catalog_plan.add_argument("--output", type=Path, required=True)
     catalog_plan.set_defaults(handler=_plan_forecast_cases)
+
+    track = subparsers.add_parser("track", help="Extract seeded cyclone tracks from Weather Hub")
+    track.add_argument("--root", type=Path, default=Path("/mnt/usb"))
+    track.add_argument("--output", type=Path, required=True)
+    track.add_argument(
+        "--cases-file", type=Path,
+        default=_project_root() / "data/handoffs/weather_hub_cases_2022_2024_v2026-09-22.csv",
+    )
+    track.add_argument(
+        "--ibtracs", type=Path,
+        default=(_project_root()
+                 / "data/frozen_sources/ibtracs.since1980.2026-09-22.study_range.csv.gz"),
+    )
+    track.add_argument("--models", nargs="+", choices=(
+        "graphcast", "fengwu", "fuxi", "pangu", "pangu_weather", "aurora",
+    ))
+    track.add_argument("--case-ids", nargs="+", help="Weather Hub forecast case IDs")
+    track.add_argument("--workers", type=int, default=4)
+    track.add_argument("--resume", action="store_true")
+    track.add_argument("--search-radius-km", type=float, default=445.0)
+    track.add_argument("--diagnostic-radius-km", type=float, default=278.0)
+    track.add_argument("--vorticity-threshold-s", type=float, default=5e-5)
+    track.set_defaults(handler=_track_forecasts)
 
     return parser
 
@@ -315,6 +338,27 @@ def _plan_forecast_cases(args: argparse.Namespace) -> int:
     schedule.to_csv(args.output, index=False)
     print(f"Planned {len(schedule)} forecast cases: {args.output}")
     return 0
+
+
+def _track_forecasts(args: argparse.Namespace) -> int:
+    from ai_weather_eval.tracking.batch import run_tracking
+    from ai_weather_eval.tracking.core import TrackerConfig
+
+    try:
+        summary = run_tracking(
+            root=args.root, output=args.output, cases_file=args.cases_file,
+            ibtracs_file=args.ibtracs, models=args.models, case_ids=args.case_ids,
+            workers=args.workers, resume=args.resume,
+            config=TrackerConfig(
+                search_radius_km=args.search_radius_km,
+                diagnostic_radius_km=args.diagnostic_radius_km,
+                vorticity_threshold_s=args.vorticity_threshold_s,
+            ),
+        )
+    except (ValueError, OSError) as exc:
+        raise ConfigError(str(exc)) from exc
+    print(json.dumps(summary, indent=2, ensure_ascii=False))
+    return 1 if summary.get("input_error_cases", 0) else 0
 
 
 def main(argv: Sequence[str] | None = None) -> int:
