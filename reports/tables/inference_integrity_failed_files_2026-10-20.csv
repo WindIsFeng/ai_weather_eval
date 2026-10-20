@@ -1,0 +1,3 @@
+model,case_id,file,expected_bytes,actual_bytes,missing_bytes,path,errors
+pangu,2023271N14144-CE03-L072,upper.nc,2060534744,1790181376,270353368,/mnt/usb/d19f65b6-1f3b-4cac-9392-363a82cf8c15/outputs/pangu/cases/2023271N14144-CE03-L072/upper.nc,OSError: [Errno -101] NetCDF: HDF error: '/mnt/usb/d19f65b6-1f3b-4cac-9392-363a82cf8c15/outputs/pangu/cases/2023271N14144-CE03-L072/upper.nc'
+pangu,2023279N08157-CE01-L096,upper.nc,2914672873,2221146112,693526761,/mnt/usb/d19f65b6-1f3b-4cac-9392-363a82cf8c15/outputs/pangu/cases/2023279N08157-CE01-L096/upper.nc,OSError: [Errno -101] NetCDF: HDF error: '/mnt/usb/d19f65b6-1f3b-4cac-9392-363a82cf8c15/outputs/pangu/cases/2023279N08157-CE01-L096/upper.nc'
