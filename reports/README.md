@@ -7,4 +7,6 @@
 
 - [五模型台风路径提取与并行性能（2026-10-21）](typhoon_tracking_2026-10-21.md)：
   全量路径覆盖、独立验证、并行基准与结果来源。
+- [三场随机风暴路径对照（2026-10-21）](typhoon_track_samples_2026-10-21.md)：
+  Ian、Ernesto、Carlotta 的 best track 与五模型预测路径图及抽样来源。
 

@@ -149,3 +149,15 @@ conda run --name ai-weather-eval python scripts/benchmark_tracker.py \
 若 16 进程相对 8 进程至少提速 10%，继续测 32 进程；选择实测最快者，
 耗时差在 5% 内时取进程更少者。缓存预热结果反映重复处理的性能，
 全量运行耗时另行报告。实际性能选择与最终覆盖统计以运行报告为准。
+
+## 个例路径图
+
+用固定随机种子从风暴 SID 抽取三场，并将首个沿海事件的五种起报提前量与 best track 叠加：
+
+```bash
+conda run --name ai-weather-eval python scripts/plot_sample_tracks.py
+```
+
+输出 600 DPI TIFF 和 PNG 预览；缺少起报位置或追踪失败的面板保留明确标记。
+抽样规则、首批结果和文件说明见
+[三场风暴路径对照](../reports/typhoon_track_samples_2026-10-21.md)。
