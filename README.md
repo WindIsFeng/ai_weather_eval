@@ -8,7 +8,8 @@ hours on either side; this one-minute-wind threshold defines the study's
 "severe tropical cyclone" sample.
 
 This repository contains coastal-case selection and QC, forecast-case planning,
-model-output adapters, and IFS/WeatherNext track processing. Model inference is
+model-output adapters, IFS/WeatherNext track processing, and a parallel cyclone
+tracker for the five models' Weather Hub NetCDF forecasts. Model inference is
 managed outside this repository.
 
 ## Research Scope
@@ -97,17 +98,34 @@ The `environment.yml` file records only the environment name, Python 3.12, and
 pip. Python dependency declarations remain in `pyproject.toml`, but packages
 are installed only as required by the current development task.
 
-The CLI supports configuration checks, coastal-catalog construction, and
-forecast-case planning. IFS extraction, WeatherNext evaluation, catalog QC,
-and the Weather Hub handoff use the scripts in `scripts/`. General gridded
-forecast ingestion, verification, and model comparison remain future work.
+Extract all five models' cyclone paths using the frozen initialization positions:
+
+```bash
+conda run --name ai-weather-eval weather-eval track \
+  --root /mnt/usb \
+  --workers 4 \
+  --output /scratch/hufeng/ai_weather_eval/outputs/typhoon_tracks
+```
+
+The [tracker guide](docs/typhoon_tracking.md) explains selection, strict resume,
+parallel benchmarking, output fields, and the Pangu-inspired method. Forecast
+fields are read from local windows on each model's native grid; input files are
+opened read-only. The frozen 570-case plan has 470 exact IBTrACS initialization
+positions and 100 `no_seed` cases per model, all retained in the outputs.
+The [full-run report](reports/typhoon_tracking_2026-10-21.md) records coverage,
+validation, and the measured worker-count selection.
+
+The CLI supports configuration checks, coastal-catalog construction,
+forecast-case planning, and seeded cyclone tracking. IFS extraction, WeatherNext
+evaluation, catalog QC, and the Weather Hub handoff use the scripts in `scripts/`.
+General gridded verification and cross-model comparisons remain future work.
 
 ## Repository Layout
 
 - `configs/`: Dataset, model, experiment, and figure configuration.
 - `data/`: Shared `raw/` and `interim/` stores, frozen sources, manifests,
   final catalogs, inference handoffs, and compact test samples.
-- `src/ai_weather_eval/`: Implemented catalog, adapter, metric, and preprocessing code.
+- `src/ai_weather_eval/`: Catalog, adapter, metric, preprocessing, and tracker code.
 - `scripts/`: Download, reconstruction, QC, handoff, and evaluation entry points.
 - `docs/`: Methodology, data definitions, and dataset-specific instructions.
 - `tests/`: Unit tests, integration tests, and compact fixtures.

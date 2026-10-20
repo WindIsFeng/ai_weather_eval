@@ -357,7 +357,13 @@ def _track_forecasts(args: argparse.Namespace) -> int:
         )
     except (ValueError, OSError) as exc:
         raise ConfigError(str(exc)) from exc
-    print(json.dumps(summary, indent=2, ensure_ascii=False))
+    display = {key: summary[key] for key in (
+        "workers", "elapsed_seconds", "cases", "planned_points", "tracked_points",
+        "case_status_counts", "input_error_cases", "resumed_cases",
+        "sampled_process_tree_peak_rss_mib",
+    )}
+    print(json.dumps({"output": str(args.output.resolve()), **display},
+                     indent=2, ensure_ascii=False))
     return 1 if summary.get("input_error_cases", 0) else 0
 
 

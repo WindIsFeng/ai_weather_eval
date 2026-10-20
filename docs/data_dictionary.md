@@ -60,4 +60,36 @@ IBTrACS/GSHHG 为参考，网格强度和动力场以 ERA5 为参考；同名指
 
 标准维度为 `init_time`、`lead_time`、`latitude`、`longitude`。变量名为 `msl`、`u10`、
 `v10`、`z500`、`u850`、`v850`、`u200`、`v200`。单位规范和气压层坐标将在适配器实现
-阶段冻结。
+阶段冻结。已实现的台风 tracker 单独读取原生网格的 `msl`（Pa）、`u10/v10` 和
+850 hPa 的 `u/v`（m s⁻¹）；不要求其他 canonical 字段已经导入。
+
+## Extracted forecast tracks
+
+`weather-eval track` 输出 `tracks.csv`，每行对应一个模型、预报案例和计划有效时刻。
+完整用法及算法见 [台风 tracker](typhoon_tracking.md)。所有计划时次均保留；缺测的
+位置和诊断值为空白，原因由 `status`/`reason` 表达。
+
+| 字段 | 含义 |
+| --- | --- |
+| `model` | `aurora`、`fengwu`、`fuxi`、`graphcast` 或 `pangu`；`pangu_weather` 归一为 `pangu` |
+| `forecast_case_id` | 完整 Weather Hub 案例键，例如 `SID-CE01-L024` |
+| `case_id`, `storm_id` | 沿海事件键 `SID-CE##` 与 IBTrACS `SID` |
+| `init_time`, `valid_time` | UTC ISO 时间；有效时间为起报时间加 `lead_hours` |
+| `nominal_lead_hours` | 案例 ID 的名义事件提前量，如 `L024` 对应 24 h |
+| `lead_hours` | 本行实际预报时效，6、12、…、`forecast_hours`；没有 0 h 观测行 |
+| `latitude`, `longitude` | 追踪中心网格点坐标（度）；经度统一为 `[-180, 180)` |
+| `msl_hpa` | 中心网格点海平面气压，hPa |
+| `vmax10_ms` | 中心诊断半径内原生网格 10 m 风速最大值，m s⁻¹ |
+| `cyclonic_vorticity_s` | 同一半径内最大气旋性 850 hPa 相对涡度，s⁻¹；南半球反号 |
+| `status` | `ok`、`no_seed`、`track_lost`、`input_error` 或 `terminated` |
+| `reason` | 无种子、筛选失败、读取异常或先前终止的具体原因 |
+
+`cases.csv` 每个模型 × `forecast_case_id` 一行，增加 `forecast_hours`、
+`seed_latitude/seed_longitude`、`planned_points`、`tracked_points`、
+`last_tracked_lead_hours/last_tracked_time`，以及运行时间、内存、检查点和指纹字段。
+案例级 `status=complete` 表示所有时次追踪成功，其余为首次失败的状态。
+`summary.json` 汇总模型覆盖、案例和时次状态、失败原因与资源记录；`run.json`
+记录参数、输入来源和代码哈希，`checkpoints/` 保存每个案例的完整结果。
+
+`vmax10_ms` 是路径邻域诊断，未统一不同模型与 ERA5 的网格和提取规则，
+不能直接作为对 IBTrACS `USA_WIND` 的同口径强度验证结果。

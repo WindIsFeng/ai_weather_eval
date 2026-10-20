@@ -1,0 +1,6 @@
+model,cases,seeded_cases,complete,track_lost,no_seed,input_error,tracked_points,planned_points
+aurora,570,470,466,4,100,0,5367,7135
+fengwu,570,470,462,8,100,0,5357,7135
+fuxi,570,470,469,1,100,0,5375,7135
+graphcast,570,470,466,4,100,0,5373,7135
+pangu,570,470,467,3,100,0,5373,7135
