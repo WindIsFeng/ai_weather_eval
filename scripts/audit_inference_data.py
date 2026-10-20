@@ -1,6 +1,7 @@
 """Read-only audit of transferred Weather Hub runs against the frozen case plan.
 
-Run with ``conda run --name ai-weather-eval python scripts/audit_inference_data.py``.
+Run with ``conda run --name ai-weather-eval python scripts/audit_inference_data.py
+--models pangu --output outputs/pangu_integrity`` (omit --models for all models).
 Checks every file's metadata and every NetCDF header before sampling each variable
 at every lead. This deliberately does not claim a full numerical or checksum scan.
 """
@@ -371,8 +372,10 @@ def main():
     parser.add_argument("--baseline", type=Path, default=BASELINE)
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--workers", type=int, default=4)
+    parser.add_argument("--models", nargs="+", choices=MODELS, default=list(MODELS))
     parser.add_argument("--metadata-only", action="store_true")
     args = parser.parse_args()
+    selected_models = tuple(dict.fromkeys(args.models))
     args.output.mkdir(parents=True, exist_ok=True)
     started = time.monotonic()
     baseline = csv_rows(args.baseline)
@@ -381,17 +384,18 @@ def main():
     report = {"started_utc": utcnow(), "baseline": str(args.baseline),
               "baseline_sha256": sha256(args.baseline), "script_sha256": sha256(__file__),
               "scope": "all files and NetCDF structures; every variable at every lead sampled",
+              "selected_models": list(selected_models),
               "full_numerical_scan": False, "models": {}}
     tasks = []
     runs = {}
     for root in args.root.iterdir():
         if root.is_dir() and (root / "job.json").is_file():
             model = load_json(root / "job.json").get("model")
-            if model in MODELS:
+            if model in selected_models:
                 if model in runs:
                     raise ValueError(f"multiple runs for {model}")
                 runs[model] = root
-    for model in MODELS:
+    for model in selected_models:
         if model not in runs:
             raise ValueError(f"missing model run: {model}")
         summary, new_tasks = inventory_run(runs[model], model, baseline, args.output)
@@ -411,7 +415,7 @@ def main():
     with ProcessPoolExecutor(max_workers=args.workers) as pool:
         for mode in ("structure", "sample"):
             report["phase"] = mode
-            for model in MODELS:
+            for model in selected_models:
                 report["models"][model][mode] = {"checked_files": 0, "failed_files": 0,
                     "sample_values": 0, "sample_tiles": 0, "sampled_leads": 0}
             save_report()
