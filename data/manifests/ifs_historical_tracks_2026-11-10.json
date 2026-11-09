@@ -4,23 +4,23 @@
   "sources": {
     "aws": {
       "files": {
-        "failed": 50,
-        "available": 39
+        "available": 50,
+        "failed": 39
       },
       "decode_status": {
-        "not_decoded": 50,
-        "decoded": 39
+        "decoded": 50,
+        "not_decoded": 39
       },
-      "bytes": 133916,
+      "bytes": 185919,
       "available_cxml_prefixes": 0,
-      "decoded_tracks": 94,
-      "track_points": 1393,
+      "decoded_tracks": 127,
+      "track_points": 1939,
       "matching_outcomes": {
-        "matched_cohort": 47,
-        "matched_outside_cohort": 32,
-        "no_position_match": 15
+        "matched_cohort": 69,
+        "matched_outside_cohort": 39,
+        "no_position_match": 19
       },
-      "new_cases": 12
+      "new_cases": 18
     },
     "ncar": {
       "files": {
@@ -38,22 +38,22 @@
         "matched_cohort": 100,
         "no_position_match": 40
       },
-      "new_cases": 14
+      "new_cases": 10
     }
   },
   "selection": "Uploaded BUFR, then AWS HRES BUFR, then NCAR ECMWF deterministic CXML",
   "coverage": {
     "total_cases": 570,
-    "available_cases": 310,
+    "available_cases": 312,
     "cases_by_source": {
       "uploaded_bufr": 284,
-      "ncar": 14,
-      "aws": 12
+      "aws": 18,
+      "ncar": 10
     },
     "available_cases_by_lead": {
       "24": 105,
       "48": 94,
-      "72": 72,
+      "72": 74,
       "96": 22,
       "120": 17
     },
@@ -66,8 +66,8 @@
   },
   "matched_track_comparison": {
     "uploaded_bufr_vs_aws": {
-      "paired_points": 489,
-      "identical_positions_wind_pressure": 489,
+      "paired_points": 680,
+      "identical_positions_wind_pressure": 680,
       "median_distance_km": 0.0,
       "max_distance_km": 1.6470531396621731e-12,
       "max_wind_difference_ms": 7.105427357601002e-15,
@@ -82,11 +82,11 @@
       "max_pressure_difference_hpa": 0.0
     },
     "aws_vs_ncar": {
-      "paired_points": 334,
-      "identical_positions_wind_pressure": 319,
+      "paired_points": 636,
+      "identical_positions_wind_pressure": 603,
       "median_distance_km": 0.0,
       "max_distance_km": 6.192671441537377e-12,
-      "max_wind_difference_ms": 0.09999999999999964,
+      "max_wind_difference_ms": 0.10000000000000142,
       "max_pressure_difference_hpa": 0.0
     }
   },
@@ -94,27 +94,27 @@
     "file_inventory": {
       "path": "data/manifests/ifs_historical_tracks_files_2026-11-10.csv",
       "rows": 172,
-      "sha256": "f511c97cf8f3468ee5e4a67f2714029d224b6a49cf2ebd0934da811e04a55b1f"
+      "sha256": "054107dde858f3ab6c1e3c5053286e857704ad802d5a38bde80175f19a7f5b26"
     },
     "case_supplement": {
       "path": "data/catalogs/ifs_case_supplement_2026-11-10.csv",
       "rows": 570,
-      "sha256": "984fb3b0317eba75fe83c8693f22307473499057ede0a9532c8e117af3de75f9"
+      "sha256": "278864a315988188e8763a5bab3cbac5e6e5f2b44d377ea60f45da2b8e358cbd"
     },
     "cohort_tracks": {
       "path": "data/interim/ifs_historical_tracks/cohort_tracks.csv.gz",
-      "rows": 38614,
-      "sha256": "850de970aa33dd909fd8a4e3aaa217cf35445e6265f0299ebf7c947be3435ab2"
+      "rows": 39030,
+      "sha256": "89dd1d8d0a093d20cec9318d963a483b4a341399bb41ef2979e6acebc1ffa35c"
     },
     "matched_case_endpoints": {
       "path": "data/interim/ifs_historical_tracks/matched_case_endpoints.csv.gz",
-      "rows": 613,
-      "sha256": "97c89d24884b1bf960015dfe1994443200ef257f9c2cf3a284f118a14f8745f2"
+      "rows": 617,
+      "sha256": "4386ed2ad02979883700f1761f2685cb77e44515fba2866599516cfce2390642"
     },
     "aws_storm_links": {
       "path": "data/interim/ifs_historical_tracks/aws_storm_links.csv.gz",
-      "rows": 94,
-      "sha256": "35adb05132fdf6873b1ee756938522e190d4ceb9b3204251ca2a2ca83e3d2d57"
+      "rows": 127,
+      "sha256": "deae6b3e94d7bcdcea28e62b9be4dcacaad4cf5c77078d393e865b29ba31983d"
     },
     "ncar_storm_links": {
       "path": "data/interim/ifs_historical_tracks/ncar_storm_links.csv.gz",
