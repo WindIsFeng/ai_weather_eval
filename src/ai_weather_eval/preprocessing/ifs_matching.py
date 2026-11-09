@@ -176,7 +176,9 @@ def match_ifs_to_cohort(
     if not pts.empty:
         metadata = pts.message_id.map(msg_lookup.init_time)
         members = pts.message_id.map(msg_lookup.member_number)
-        if not pts.init_time.eq(metadata).all() or not pts.member_number.eq(members).all():
+        # Deterministic CXML does not encode a member number on either record.
+        same_member = pts.member_number.eq(members) | (pts.member_number.isna() & members.isna())
+        if not pts.init_time.eq(metadata).all() or not same_member.all():
             raise ValueError("Track initialization or member conflicts with its message")
 
     truth_by_time = {key: group for key, group in obs.groupby("ISO_TIME", sort=False)}
