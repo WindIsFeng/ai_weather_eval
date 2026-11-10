@@ -78,10 +78,3 @@ BUFR 结构会记录错误并终止，不默默丢弃。
 解码结构及成员含义参考 ECMWF 官方的
 [BUFR 示例](https://confluence.ecmwf.int/spaces/ECC/pages/52462870/bufr_read_tropical_cyclone)
 和[风圈产品说明](https://confluence.ecmwf.int/spaces/FCST/pages/177485373/New%2BTropical%2BCyclone%2BWind%2BRadii%2Bproduct)。
-
-## 历史档案补充
-
-[2026-11-10 的补充报告](../reports/ifs_historical_tracks_2026-11-10.md)
-记录 AWS BUFR 和 NCAR TIGGE CXML 的下载、匹配与重建方式。
-[逐案例补充表](../data/catalogs/ifs_case_supplement_2026-11-10.csv)
-为每个冻结案例记录选用来源和原始文件。2026-10-01 的审计表继续作为上传包基线。
